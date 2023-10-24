@@ -5,8 +5,13 @@
 
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router'; // 引入Vue Router配置文件
+import router from './router'; // 引入Vue Router
+import VueAxios from 'vue-axios'
+import 'element-plus/dist/index.css'
+import ElementPlus from 'element-plus'
 
-createApp(App)
-  .use(router) // 使用Vue Router
-  .mount('#app');
+const app = createApp(App)
+app.use(ElementPlus)
+app.use(VueAxios)
+app.use(router)
+app.mount('#app')

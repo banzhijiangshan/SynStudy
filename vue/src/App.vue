@@ -38,20 +38,16 @@ export default {
 -->
 
 <template>
-  <div>
-    <FullScreenImage />
-    <router-link to="/signup"></router-link>
-    <router-view></router-view>
-  </div>
+  <router-view style="height: 100%; width: 100%"></router-view>
 </template>
 
-<script>
-import FullScreenImage from "@/components/DengLu1.vue";
+<!--<script>
+import IndexPage from "@/components/IndexPage.vue";
 
 export default {
   name: "App",
   components: {
-    FullScreenImage,
+    IndexPage,
   },
 };
 </script>
@@ -66,3 +62,4 @@ export default {
   margin-top: 60px;
 }
 </style>
+-->
