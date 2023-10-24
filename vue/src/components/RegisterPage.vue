@@ -2,7 +2,7 @@
   <div>
     <el-main class="el-main">
       <el-image
-        :src="require('@/assets/back.png')"
+        :src="require('@/assets/register.png')"
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
       <el-row class="el-row">
@@ -11,6 +11,16 @@
             <el-form :model="form" label-width="auto" size="large">
               <br />
               <br />
+              <el-form-item class="el-form-item">
+                <el-input
+                  class="el-input"
+                  maxlength="30"
+                  show-word-limits
+                  placeholder="学号"
+                  v-model="form.id"
+                />
+              </el-form-item>
+
               <el-form-item class="el-form-item">
                 <el-input
                   class="el-input"
@@ -38,38 +48,10 @@
                   class="el-input"
                   maxlength="30"
                   show-word-limit
-                  placeholder="标签"
-                  v-model="form.label"
-                />
-              </el-form-item>
-
-              <el-form-item class="el-form-item">
-                <el-input
-                  class="el-input"
-                  maxlength="10"
-                  show-word-limit
-                  placeholder="地区"
-                  v-model="form.area"
-                />
-              </el-form-item>
-
-              <el-form-item class="el-form-item">
-                <el-input
-                  class="el-input"
-                  maxlength="10"
-                  show-word-limit
-                  placeholder="阶段"
-                  v-model="form.stage"
-                />
-              </el-form-item>
-
-              <el-form-item class="el-form-item">
-                <el-input
-                  class="el-input"
-                  maxlength="20"
-                  show-word-limit
-                  placeholder="学校"
-                  v-model="form.school"
+                  placeholder="重复密码"
+                  show-password
+                  v-model="form.repeatpassword"
+                  type="password"
                 />
               </el-form-item>
 
@@ -78,36 +60,24 @@
                   class="el-input"
                   maxlength="30"
                   show-word-limit
-                  placeholder="目标"
-                  v-model="form.goal"
-                />
-              </el-form-item>
-
-              <el-form-item class="el-form-item">
-                <el-switch
-                  v-model="form.sex"
-                  style="
-                    --el-switch-on-color: #467dc7;
-                    --el-switch-off-color: #83e112;
-                  "
-                  active-value="0"
-                  inactive-value="1"
-                  active-text="男"
-                  inactive-text="女"
+                  placeholder="邮箱"
+                  show-password
+                  v-model="form.email"
+                  type="password"
                 />
               </el-form-item>
 
               <el-row>
-                <el-col :span="6" :offset="6">
+                <el-col :span="8" :offset="4">
                   <el-button
                     type="primary"
                     class="button-class"
                     round
                     @click="commit"
-                    >提交</el-button
+                    >注册</el-button
                   >
                 </el-col>
-                <el-col :span="6">
+                <el-col :span="8">
                   <el-button
                     type="success"
                     class="button-class"
@@ -184,13 +154,14 @@ const back = () => {
 }
 
 .radius {
-  height: 85%;
+  height: 65%;
   width: 400px;
   border: 1px solid var(--el-border-color);
   border-radius: 20px;
-  margin-top: 100px;
+  margin-top: 240px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.5);
   text-align: center;
+  background-color: #daf3f1 !important;
 }
 
 .el-main {
@@ -202,7 +173,7 @@ const back = () => {
 
 .el-row {
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
 }
 
 .el-form-item {
@@ -216,9 +187,11 @@ const back = () => {
 }
 
 .button-class {
-  width: 70px;
-  height: 50px;
+  width: 70%;
+  height: 80%;
   text-align: center;
-  font-size: 30px;
+  font-size: 20px;
+  background-color: #1677ff;
+  border-radius: 7px !important;
 }
 </style>

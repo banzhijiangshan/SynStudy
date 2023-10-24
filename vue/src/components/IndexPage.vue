@@ -6,7 +6,7 @@
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
       <el-row class="el-row">
-        <el-col align="center">
+        <el-col>
           <div class="radius">
             <el-form :model="form" label-width="auto" size="large">
               <br />
@@ -16,7 +16,7 @@
                   class="el-input"
                   maxlength="30"
                   show-word-limit
-                  placeholder="用户名"
+                  placeholder="学号"
                   v-model="form.name"
                 />
               </el-form-item>
@@ -33,7 +33,7 @@
               </el-form-item>
 
               <el-row>
-                <el-col :span="6" :offset="6">
+                <el-col :span="8" :offset="4">
                   <el-button
                     type="primary"
                     class="button-class"
@@ -42,7 +42,7 @@
                     >登录</el-button
                   >
                 </el-col>
-                <el-col :span="6">
+                <el-col :span="8">
                   <el-button
                     type="success"
                     class="button-class"
@@ -93,22 +93,16 @@ const register = async () => {
 </script>
 
 <style scoped>
-.h1 {
-  text-align: center;
-  font-size: 100px;
-  transform: translateY(-50%);
-  color: #ffbc37;
-  font-family: STLiti, serif;
-}
-
 .radius {
-  height: 70%;
-  width: 400px;
+  height: 45%;
+  width: 32%;
   border: 1px solid var(--el-border-color);
   border-radius: 20px;
-  margin-top: 100px;
+  margin-top: 19%;
+  margin-left: 63%;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.5);
   text-align: center;
+  background-color: #daf3f1 !important;
 }
 
 .el-main {
@@ -120,7 +114,7 @@ const register = async () => {
 
 .el-row {
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 80px;
 }
 
 .el-input {
@@ -129,9 +123,11 @@ const register = async () => {
 }
 
 .button-class {
-  width: 70px;
-  height: 50px;
+  width: 70%;
+  height: 80%;
   text-align: center;
-  font-size: 30px;
+  font-size: 20px;
+  background-color: #1677ff;
+  border-radius: 7px !important;
 }
 </style>
