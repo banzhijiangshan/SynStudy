@@ -58,6 +58,9 @@
       </el-row>
     </el-main>
   </div>
+  <div class="custom-container">
+    <LunBo></LunBo>
+  </div>
 </template>
 
 <script setup>
@@ -65,6 +68,7 @@ import { useRouter } from "vue-router";
 import { reactive } from "vue";
 import instance from "@/axios";
 import { ElMessage } from "element-plus";
+import LunBo from "./LunBo.vue";
 
 const router = useRouter();
 
@@ -94,8 +98,8 @@ const register = async () => {
 
 <style scoped>
 .radius {
-  height: 45%;
-  width: 32%;
+  height: 42%;
+  width: 30%;
   border: 1px solid var(--el-border-color);
   border-radius: 20px;
   margin-top: 19%;
@@ -114,7 +118,7 @@ const register = async () => {
 
 .el-row {
   margin-top: 10px;
-  margin-bottom: 80px;
+  margin-bottom: 100px;
 }
 
 .el-input {
@@ -129,5 +133,10 @@ const register = async () => {
   font-size: 20px;
   background-color: #1677ff;
   border-radius: 7px !important;
+}
+
+.custom-container {
+  margin-top: -600px; /* 向下偏移 20px */
+  margin-left: 5px; /* 向右偏移 50px */
 }
 </style>
