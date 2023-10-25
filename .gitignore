@@ -1,6 +1,6 @@
 .DS_Store
-/vue/node_modules/
-/vue/dist/
+/my-vue/node_modules/
+/my-vue/dist/
 .vscode
 .idea
 **/.DS_Store
