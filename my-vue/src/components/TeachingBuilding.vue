@@ -1,8 +1,10 @@
 <template>
   <div>
     <el-main class="el-main">
+      <PersonalDia ref="infoRef"></PersonalDia>
+      <InfoDia ref="infoRef1"></InfoDia>
       <el-image
-        :src="backImage"
+        :src="require('@/assets/home.png')"
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
       <el-button
@@ -13,13 +15,23 @@
         :style="{ width: '130px', height: '130px' }"
       ></el-button>
       <div class="left-top">
-        <el-button type="primary" circle class="button-class">
+        <el-button
+          type="primary"
+          circle
+          class="button-class"
+          @click="showPersonalDialog"
+        >
           <el-icon style="vertical-align: middle">
             <User />
           </el-icon>
         </el-button>
 
-        <el-button type="primary" circle class="button-class">
+        <el-button
+          type="primary"
+          circle
+          class="button-class"
+          @click="showInfoDia"
+        >
           <el-icon style="vertical-align: middle">
             <MoreFilled />
           </el-icon>
@@ -36,22 +48,34 @@
   </div>
 </template>
 
-<script setup>
-import { useRouter } from "vue-router";
+<script>
 import { ElMessage } from "element-plus";
-import backImage from "../assets/home.png";
+import PersonalDia from "./UserInfo.vue";
+import InfoDia from "./MoreInfo.vue";
 
-const router = useRouter();
-
-const enter = async () => {
-  await router.push("/floor");
-};
-const logout = async () => {
-  ElMessage({
-    message: "Goodbye!Have a nice day in your real life!",
-    type: "success",
-  });
-  await router.push("/");
+export default {
+  components: {
+    PersonalDia,
+    InfoDia,
+  },
+  methods: {
+    showPersonalDialog() {
+      this.$refs.infoRef.open();
+    },
+    logout() {
+      this.$router.push("/");
+      ElMessage({
+        message: "Goodbye!Have a nice day in your real life!",
+        type: "success",
+      });
+    },
+    enter() {
+      this.$router.push("/floor");
+    },
+    showInfoDia() {
+      this.$refs.infoRef1.open();
+    },
+  },
 };
 </script>
 

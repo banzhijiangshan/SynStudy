@@ -2,15 +2,15 @@
   <div>
     <el-dialog
       title="个人信息"
-      v-model:visible="dialogVisible"
-      width="600px"
+      v-model="dialogVisible"
+      width="60%"
       :before-close="handleClose"
     >
       <el-form :model="form" :rules="rules" ref="form" label-width="150px">
         <div class="updateinfo">
           <div class="left">
             <el-form-item label="头像" prop="avatar">
-              <img style="width: 150px; height: 110px" :src="form.avatar" />
+              <img style="width: 110px; height: 110px" :src="form.avatar" />
             </el-form-item>
             <el-form-item label="账号密码" prop="password">
               <el-input v-model="form.password"></el-input>
@@ -105,7 +105,7 @@ export default {
   },
   mounted() {
     //this.load();
-    this.dialogVisible = true;
+    this.dialogVisible = false;
   },
   methods: {
     open() {

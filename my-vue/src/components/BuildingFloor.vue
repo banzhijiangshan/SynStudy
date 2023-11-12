@@ -1,9 +1,10 @@
 <template>
   <div>
     <el-main class="el-main">
-      <PersonalDia></PersonalDia>
+      <PersonalDia ref="infoRef"></PersonalDia>
+      <InfoDia ref="infoRef1"></InfoDia>
       <el-image
-        :src="require('@/assets/floor.png')"
+        :src="require('@/assets/floorday.png')"
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
     </el-main>
@@ -21,7 +22,12 @@
           </el-icon>
         </el-button>
 
-        <el-button type="primary" circle class="button-class">
+        <el-button
+          type="primary"
+          circle
+          class="button-class"
+          @click="showInfoDia"
+        >
           <el-icon style="vertical-align: middle">
             <MoreFilled />
           </el-icon>
@@ -29,7 +35,7 @@
       </div>
 
       <div class="right-bottom">
-        <el-button type="success" class="button-class1" @click="goback">
+        <el-button type="info" class="button-class1" @click="goback">
           <span style="vertical-align: middle"> 退出 </span>
           <el-icon style="vertical-align: middle">
             <Right />
@@ -40,9 +46,26 @@
   </div>
 </template>
 
-<script setup>
-//import { useRouter } from "vue-router";
+<script>
 import PersonalDia from "./UserInfo.vue";
+import InfoDia from "./MoreInfo.vue";
+export default {
+  components: {
+    PersonalDia,
+    InfoDia,
+  },
+  methods: {
+    showPersonalDialog() {
+      this.$refs.infoRef.open();
+    },
+    goback() {
+      this.$router.push("/building");
+    },
+    showInfoDia() {
+      this.$refs.infoRef1.open();
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -70,7 +93,7 @@ import PersonalDia from "./UserInfo.vue";
 
 .right-bottom {
   position: absolute;
-  top: 780px;
+  top: 800px;
   right: 70px;
 }
 
