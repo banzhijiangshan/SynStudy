@@ -43,7 +43,6 @@
         icon="el-icon-search"
         @click="logout"
       ></el-button>
-      <el-dialog title="个人信息"></el-dialog>
     </el-main>
   </div>
 </template>

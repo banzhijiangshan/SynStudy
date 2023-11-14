@@ -43,6 +43,9 @@
         </el-button>
       </div>
     </el-row>
+    <el-button type="primary" class="enter-button" @click="goin"> </el-button>
+    <el-button type="primary" class="enter-button1" @click="goin"> </el-button>
+    <el-button type="primary" class="enter-button2" @click="goin"> </el-button>
   </div>
 </template>
 
@@ -63,6 +66,9 @@ export default {
     },
     showInfoDia() {
       this.$refs.infoRef1.open();
+    },
+    goin() {
+      this.$router.push("/classroom");
     },
   },
 };
@@ -113,5 +119,47 @@ export default {
 
 .el-dialog {
   z-index: 1000; /* Adjust the value as needed */
+}
+
+.enter-button {
+  position: absolute;
+  top: 27%;
+  left: 54.5%;
+  width: 155px;
+  height: 56px;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border: none;
+}
+.enter-button:hover {
+  background-color: transparent;
+}
+
+.enter-button1 {
+  position: absolute;
+  top: 41%;
+  left: 35.5%;
+  width: 115px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border: none;
+}
+.enter-button1:hover {
+  background-color: transparent;
+}
+
+.enter-button2 {
+  position: absolute;
+  top: 46%;
+  left: 27%;
+  width: 84px;
+  height: 38px;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border: none;
+}
+.enter-button2:hover {
+  background-color: transparent;
 }
 </style>

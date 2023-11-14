@@ -38,12 +38,10 @@
             </el-form-item>
           </div>
           <div class="right">
-            <el-form-item label="用户编号" prop="id">
+            <el-form-item label="学号" prop="id">
               <el-input v-model="form.id" disabled></el-input>
             </el-form-item>
-            <el-form-item label="账号" prop="account">
-              <el-input v-model="form.account" disabled></el-input>
-            </el-form-item>
+
             <el-form-item label="地区" prop="area">
               <el-input v-model="form.area"></el-input>
             </el-form-item>
