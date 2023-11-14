@@ -6,14 +6,14 @@
         :src="require('@/assets/study.png')"
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
+      <el-button type="primary" class="plan-button" @click="plan">
+        我的计划
+      </el-button>
+      <el-button type="primary" class="shift-button"> 切换场景 </el-button>
+      <el-button type="info" class="board-button"> 黑板 </el-button>
+      <el-button type="primary" class="back-button" @click="outclass">
+      </el-button>
     </el-main>
-    <el-button type="primary" class="plan-button" @click="plan">
-      我的计划
-    </el-button>
-    <el-button type="primary" class="shift-button"> 切换场景 </el-button>
-    <el-button type="info" class="board-button"> 黑板 </el-button>
-    <el-button type="primary" class="back-button" @click="outclass">
-    </el-button>
   </div>
 </template>
 
@@ -62,6 +62,12 @@ export default {
 </script>
 
 <style scoped>
+.el-main {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 .todo-container {
   position: absolute;
   top: 50%;
@@ -70,18 +76,19 @@ export default {
 
 .plan-button {
   position: absolute;
-  top: 37.5%;
-  left: 2.7%;
+  top: 35.5%;
+  left: 1.3%;
 }
 
 .back-button {
   position: absolute;
-  top: 10%;
-  left: 94%;
+  top: 8%;
+  left: 92.5%;
   width: 50px;
   height: 48px;
-  transform: translate(-50%, -50%);
   background-color: transparent;
+  transform: translate(-50%, -50%);
+
   border: none;
 }
 .back-button:hover {
@@ -90,13 +97,13 @@ export default {
 
 .shift-button {
   position: absolute;
-  top: 58%;
-  left: 2%;
+  top: 56%;
+  left: 0.7%;
 }
 
 .board-button {
   position: absolute;
-  top: 79%;
-  left: 2.85%;
+  top: 77%;
+  left: 1.5%;
 }
 </style>

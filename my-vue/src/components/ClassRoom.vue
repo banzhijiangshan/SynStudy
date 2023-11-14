@@ -26,10 +26,17 @@ export default {
 </script>
 
 <style scoped>
+.el-main {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .enter-button {
   position: absolute;
-  top: 42.9%;
-  left: 59.3%;
+  top: 40.5%;
+  left: 58%;
   width: 155px;
   height: 64px;
   transform: translate(-50%, -50%);
@@ -44,12 +51,13 @@ export default {
 
 .back-button {
   position: absolute;
-  top: 8.5%;
-  left: 83.3%;
+  top: 6.5%;
+  left: 82%;
   width: 3.5%;
   height: 6%;
-  transform: translate(-50%, -50%);
   background-color: transparent;
+  transform: translate(-50%, -50%);
+
   border: none;
 }
 .back-button:hover {
