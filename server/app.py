@@ -5,9 +5,8 @@ from flask_bcrypt import Bcrypt
 import json
 import sqlite3
 
-from database import insert_data, fetch_pw
+import utils, database
 
-from utils import process_register_data, process_login_data
 
 app = Flask(__name__)
 CORS(app)
@@ -22,11 +21,11 @@ def index():
 def register():
     raw_data = request.get_data()
     print(raw_data)
-    processed_data = process_register_data(raw_data)
+    processed_data = utils.process_register_data(raw_data)
     # now hash the raw password
     processed_data['password'] = bcrypt.generate_password_hash(processed_data['password'])
     try:
-        insert_data(processed_data)
+        database.insert_register_data(processed_data)
     except sqlite3.IntegrityError:
         return jsonify(code=409, message="Username already exists!")
 
@@ -36,16 +35,23 @@ def register():
 def login():
     raw_data = request.get_data()
     print(type(raw_data), raw_data)
-    processed_data = process_login_data(raw_data)
-    username = processed_data["name"]
+    processed_data = utils.process_login_data(raw_data)
+    id = processed_data["name"]
     password = processed_data["password"]
-    correct_pwd = fetch_pw(username)
+    correct_pwd = database.fetch_pw(id)
     if correct_pwd == None:
-        return jsonify(code=401, message="Username not exists!")
+        return jsonify(code=401, message="User not exists!")
     elif not bcrypt.check_password_hash(correct_pwd, password):
         return jsonify(code=401, message="Incorrect password!")
     else:
         return jsonify(code=200, message="Login successful")
+    
+@app.route('/generateStudentId', methods=['GET',])
+def get_new_id():
+    max_cur_id = database.fetch_cur_cnt()
+    new_id = max_cur_id + 10001
+    return jsonify(code=200, message="Get new id successful", data={'studentId':new_id})
+
 
 
 if __name__ == '__main__':
