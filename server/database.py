@@ -27,24 +27,26 @@ def insert_data(data):
     """
     对于处理过的字节流, 将其分解为数据库中的记录
     """
-    conn = sqlite3.connect('devices_data.db')
+    conn = sqlite3.connect('user_data.db')
     c = conn.cursor()
 
-    username = data["username"]
+    username = data["name"]
     password = data["password"]
 
     c.execute(
-    "INSERT INTO devices (username, password) VALUES (?, ?)",
+
+    "INSERT INTO users (username, password) VALUES (?, ?)",
+
     (username, password))
 
     conn.commit()
     conn.close()
 
-def fetch_data(username):
+def fetch_pw(username):
     """
     根据用户名查找对应的加密后密码
     """
-    conn = sqlite3.connect('your_database.db')
+    conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
     query = "SELECT password FROM users WHERE username = ?"
