@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 
@@ -44,14 +44,29 @@ def login():
     elif not bcrypt.check_password_hash(correct_pwd, password):
         return jsonify(code=401, message="Incorrect password!")
     else:
+        session['user_id'] = id
         return jsonify(code=200, message="Login successful")
+
+@app.route('/logout', methods=['POST',])
+def logout():
+    session.pop('user_id', None)
+    return jsonify(code=200, message="Logout successful")
     
 @app.route('/generateStudentId', methods=['GET',])
 def get_new_id():
     max_cur_id = database.fetch_cur_cnt()
     new_id = max_cur_id + 10001
-    return jsonify(code=200, message="Get new id successful", data={'studentId':new_id})
+    return jsonify(code=200, message="Get new id successful", studentId=new_id)
 
+@app.route('/getStudentName', methods=['GET',])
+def get_name_by_id():
+    id = session.get('user_id')
+    user_info = database.fetch_user_info(id)
+    name = user_info['username']
+    if name == None:
+        return jsonify(code=401, message="id error")
+    else:
+        return jsonify(code=200, message="Get name successful", name=name)
 
 
 if __name__ == '__main__':

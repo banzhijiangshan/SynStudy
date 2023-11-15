@@ -84,6 +84,22 @@ def fetch_cur_cnt():
 
     return result[0] if result else None
 
+def fetch_user_info(id):
+    """
+    根据id获取用户信息
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "SELECT * FROM users WHERE id = ?"
+    cursor.execute(query, (id,))
+
+    result = cursor.fetchone()
+    conn.close()
+
+    return result if result else None
+
+
 if __name__ == "__main__":
     create_db()
 

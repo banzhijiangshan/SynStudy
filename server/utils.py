@@ -12,3 +12,7 @@ def process_register_data(raw_data):
 def process_login_data(raw_data):
     json_res = binary_to_json(raw_data)
     return json_res
+
+def process_get_info_data(raw_data):
+    json_res = binary_to_json(raw_data)
+    return json_res
