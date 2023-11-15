@@ -15,8 +15,8 @@
       <el-button type="info" class="board-button"> 黑板 </el-button>
       <el-button type="primary" class="back-button" @click="outclass">
       </el-button>
+      <ClockCounter class="myclk"></ClockCounter>
     </el-main>
-
     <!-- 左上角的按钮组 -->
     <div class="left-top">
       <el-button
@@ -48,12 +48,14 @@
 import PlanTable from "./PlanTable.vue";
 import PersonalDia from "./UserInfo.vue";
 import InfoDia from "./MoreInfo.vue";
+import ClockCounter from "./ClockCounter.vue";
 
 export default {
   components: {
     PlanTable,
     PersonalDia,
     InfoDia,
+    ClockCounter,
   },
   methods: {
     //添加todo
@@ -157,5 +159,11 @@ export default {
   position: absolute;
   top: 20px;
   left: 30px;
+}
+
+.myclk {
+  position: absolute;
+  top: 4.3%;
+  left: 52.7%;
 }
 </style>
