@@ -16,8 +16,8 @@
                   class="el-input"
                   maxlength="30"
                   show-word-limits
-                  placeholder="学号"
                   v-model="form.id"
+                  disabled
                 />
               </el-form-item>
 
@@ -61,9 +61,7 @@
                   maxlength="30"
                   show-word-limit
                   placeholder="邮箱"
-                  show-password
                   v-model="form.email"
-                  type="password"
                 />
               </el-form-item>
 
@@ -100,17 +98,13 @@ import { useRouter } from "vue-router";
 import { reactive } from "vue";
 import instance from "@/axios";
 import { ElMessage } from "element-plus";
-import { onMounted } from 'vue';
+import { onMounted } from "vue";
 
 const form = reactive({
+  id: "",
   name: "",
   password: "",
-  label: "",
-  sex: "",
-  area: "",
-  stage: "",
-  school: "",
-  goal: "",
+  email: "",
 });
 
 const router = useRouter();
@@ -140,21 +134,18 @@ const back = () => {
 
 const fetchStudentId = async () => {
   try {
-    const response = await instance.get(
-      "/generateStudentId"
-    );
-    if (response.data && response.data.studentId){
-      form.id = response.data.studentId;
+    const response = await instance.get("/generateStudentId");
+    if (response.data.data && response.data.data.studentId) {
+      form.id = response.data.data.studentId;
     }
   } catch (error) {
     console.error("Error fetching student ID", error);
   }
 };
 
-onMounted(() =>{
-fetchStudentId(); // 页面加载时获取学号
+onMounted(() => {
+  fetchStudentId(); // 页面加载时获取学号
 });
-
 </script>
 
 <style scoped>

@@ -50,12 +50,16 @@
 <script>
 import { ElMessage } from "element-plus";
 import PersonalDia from "./UserInfo.vue";
+import instance from "@/axios";
 import InfoDia from "./MoreInfo.vue";
 
 export default {
   components: {
     PersonalDia,
     InfoDia,
+  },
+  mounted() {
+    this.getStudentName();
   },
   methods: {
     showPersonalDialog() {
@@ -73,6 +77,16 @@ export default {
     },
     showInfoDia() {
       this.$refs.infoRef1.open();
+    },
+    getStudentName() {
+      instance.get("/getStudentName").then((res) => {
+        if (res.data.code === 200) {
+          ElMessage({
+            message: "欢迎" + res.data.data.name + "同学!",
+            type: "success",
+          });
+        }
+      });
     },
   },
 };

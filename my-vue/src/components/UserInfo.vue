@@ -15,7 +15,7 @@
             <el-form-item label="账号密码" prop="password">
               <el-input v-model="form.password"></el-input>
             </el-form-item>
-            <el-form-item label="昵称" prop="nickname">
+            <el-form-item label="用户名" prop="nickname">
               <el-input v-model="form.nickname"></el-input>
             </el-form-item>
             <el-form-item label="年龄" prop="age">

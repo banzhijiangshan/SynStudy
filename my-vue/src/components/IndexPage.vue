@@ -16,7 +16,7 @@
                   class="el-input"
                   maxlength="30"
                   show-word-limit
-                  placeholder="学号"
+                  placeholder="学号/用户名/邮箱"
                   v-model="form.name"
                 />
               </el-form-item>
