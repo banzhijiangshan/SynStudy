@@ -79,7 +79,7 @@ const form = reactive({
 
 const login = async () => {
   instance
-    .post("http://localhost:5000/login", {
+    .post("/login", {
       name: form.name,
       password: form.password,
     })
