@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import json
 import sqlite3
 
@@ -12,9 +13,10 @@ app = Flask(__name__)
 def index():
     pass
 
-@app.route('/register', methods=['POST',])
+@app.route('/register', methods=['POST','OPTIONS'])
 def register():
     raw_data = request.get_data()
+    print(raw_data)
     processed_data = process_register_data(raw_data)
     try:
         insert_data(processed_data)
@@ -23,9 +25,10 @@ def register():
 
     return jsonify(code=200, message="Register successful")
 
-@app.route('/login', methods=['POST',])
+@app.route('/login', methods=['POST','OPTIONS'])
 def login():
     raw_data = request.get_data()
+    print(type(raw_data), raw_data)
     processed_data = process_login_data(raw_data)
     username = processed_data["username"]
     password = processed_data["password"]
@@ -38,4 +41,4 @@ def login():
         return jsonify(code=200, message="Login successful")
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port='5000')
+    app.run(host='0.0.0.0', port='5000')

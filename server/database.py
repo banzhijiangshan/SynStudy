@@ -35,7 +35,7 @@ def insert_data(data):
 
     c.execute(
     "INSERT INTO devices (username, password) VALUES (?, ?)",
-    (username, password)
+    (username, password))
 
     conn.commit()
     conn.close()
