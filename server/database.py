@@ -42,32 +42,47 @@ def insert_register_data(data):
     conn.commit()
     conn.close()
 
-def fetch_pw(user_input):
+def fetch_pw_and_id(user_input):
     """
-    根据学号/用户名/邮箱查找对应的加密后密码
+    根据学号/用户名/邮箱查找对应的加密后密码和用户id
     """
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
     # check if user_input is email
     if re.match(r"[^@]+@[^@]+\.[^@]+", user_input):
-        query = "SELECT password FROM users WHERE email = ?"
+        query = "SELECT password, id FROM users WHERE email = ?"
         cursor.execute(query, (user_input,))
+        result = cursor.fetchone()  # will return a tuple even if only returns one column
+        conn.close()
+
+        pw = result[0]
+        id = result[1]
+
     # check if user_input is username (4-16 characters started with letter)
     elif re.match(r"[a-zA-Z][a-zA-Z0-9]{3,15}", user_input):
-        query = "SELECT password FROM users WHERE username = ?"
+        query = "SELECT password, id FROM users WHERE username = ?"
         cursor.execute(query, (user_input,))
+        result = cursor.fetchone()
+        conn.close()
+
+        pw = result[0]
+        id = result[1]
+
     # check if user_input is student id
     elif re.match(r"\d{5}", user_input):
         query = "SELECT password FROM users WHERE id = ?"
         cursor.execute(query, ((int(user_input) - 10000),))
+        result = cursor.fetchone()
+        conn.close()
+        
+        pw = result[0]
+        id = int(user_input) - 10000
+
     else:
         return None
 
-    result = cursor.fetchone()
-    conn.close()
-
-    return result[0] if result else None
+    return (pw, id) if result else None
 
 def fetch_cur_cnt():
     """
@@ -89,13 +104,15 @@ def fetch_user_info(id):
     根据id获取用户信息
     """
     conn = sqlite3.connect('user_data.db')
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
     query = "SELECT * FROM users WHERE id = ?"
     cursor.execute(query, (id,))
 
-    result = cursor.fetchone()
+    result = dict(cursor.fetchone())  # returns a tuple
     conn.close()
+
 
     return result if result else None
 

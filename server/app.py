@@ -9,9 +9,12 @@ import utils, database
 
 
 app = Flask(__name__)
+app.secret_key = 'a_random_key'
+
 CORS(app)
 
 bcrypt = Bcrypt(app)
+
 
 @app.route('/')
 def index():
@@ -36,9 +39,9 @@ def login():
     raw_data = request.get_data()
     print(type(raw_data), raw_data)
     processed_data = utils.process_login_data(raw_data)
-    id = processed_data["name"]
+    name = processed_data["name"]
     password = processed_data["password"]
-    correct_pwd = database.fetch_pw(id)
+    correct_pwd, id = database.fetch_pw_and_id(name)
     if correct_pwd == None:
         return jsonify(code=401, message="User not exists!")
     elif not bcrypt.check_password_hash(correct_pwd, password):
