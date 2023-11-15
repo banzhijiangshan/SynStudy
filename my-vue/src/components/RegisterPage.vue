@@ -100,6 +100,7 @@ import { useRouter } from "vue-router";
 import { reactive } from "vue";
 import instance from "@/axios";
 import { ElMessage } from "element-plus";
+import { onMounted } from 'vue';
 
 const form = reactive({
   name: "",
@@ -136,6 +137,24 @@ const commit = async () => {
 const back = () => {
   router.push("/");
 };
+
+const fetchStudentId = async () => {
+  try {
+    const response = await instance.get(
+      "/generateStudentId"
+    );
+    if (response.data && response.data.studentId){
+      form.id = response.data.studentId;
+    }
+  } catch (error) {
+    console.error("Error fetching student ID", error);
+  }
+};
+
+onMounted(() =>{
+fetchStudentId(); // 页面加载时获取学号
+});
+
 </script>
 
 <style scoped>
