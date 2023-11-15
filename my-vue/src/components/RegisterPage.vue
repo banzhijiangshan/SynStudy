@@ -135,8 +135,8 @@ const back = () => {
 const fetchStudentId = async () => {
   try {
     const response = await instance.get("/generateStudentId");
-    if (response.data.data && response.data.data.studentId) {
-      form.id = response.data.data.studentId;
+    if (response.data && response.data.studentId) {
+      form.id = response.data.studentId;
     }
   } catch (error) {
     console.error("Error fetching student ID", error);

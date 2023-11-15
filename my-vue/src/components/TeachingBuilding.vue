@@ -82,7 +82,7 @@ export default {
       instance.get("/getStudentName").then((res) => {
         if (res.data.code === 200) {
           ElMessage({
-            message: "欢迎" + res.data.data.name + "同学!",
+            message: "欢迎" + res.data.name + "同学!",
             type: "success",
           });
         }
