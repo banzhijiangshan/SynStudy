@@ -34,7 +34,9 @@ def insert_data(data):
     password = data["password"]
 
     c.execute(
+
     "INSERT INTO users (username, password) VALUES (?, ?)",
+
     (username, password))
 
     conn.commit()

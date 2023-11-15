@@ -119,13 +119,7 @@ const commit = async () => {
     .post("/register", {
       name: form.name,
       password: form.password,
-      label: form.label,
-      sex: parseInt(form.sex),
-      area: form.area,
-      stage: form.stage,
-      school: form.school,
-      goal: form.goal,
-      image: "/default.png",
+      email: form.email,
     })
     .then((res) => {
       if (res.data.code === 200) {
