@@ -2,6 +2,8 @@
   <div>
     <el-main class="el-main">
       <PlanTable ref="infoRef"></PlanTable>
+      <PersonalDia ref="infoRef1"></PersonalDia>
+      <InfoDia ref="infoRef2"></InfoDia>
       <el-image
         :src="require('@/assets/study.png')"
         style="margin: 0; position: absolute; height: 100%; width: 100%"
@@ -14,14 +16,45 @@
       <el-button type="primary" class="back-button" @click="outclass">
       </el-button>
     </el-main>
+
+    <!-- 左上角的按钮组 -->
+    <div class="left-top">
+      <el-button
+        type="primary"
+        circle
+        class="button-class"
+        @click="showPersonalDialog"
+      >
+        <el-icon style="vertical-align: middle">
+          <User />
+        </el-icon>
+      </el-button>
+
+      <el-button
+        type="primary"
+        circle
+        class="button-class"
+        @click="showInfoDia"
+      >
+        <el-icon style="vertical-align: middle">
+          <MoreFilled />
+        </el-icon>
+      </el-button>
+    </div>
   </div>
 </template>
 
 <script>
 import PlanTable from "./PlanTable.vue";
+import PersonalDia from "./UserInfo.vue";
+import InfoDia from "./MoreInfo.vue";
 
 export default {
-  components: { PlanTable },
+  components: {
+    PlanTable,
+    PersonalDia,
+    InfoDia,
+  },
   methods: {
     //添加todo
     addTodo(todoObj) {
@@ -56,6 +89,12 @@ export default {
     },
     outclass() {
       this.$router.push("/classroom");
+    },
+    showPersonalDialog() {
+      this.$refs.infoRef1.open();
+    },
+    showInfoDia() {
+      this.$refs.infoRef2.open();
     },
   },
 };
@@ -105,5 +144,18 @@ export default {
   position: absolute;
   top: 77%;
   left: 1.5%;
+}
+
+.button-class {
+  display: inline-block;
+  min-width: 50px;
+  height: 50px;
+  font-size: 24px;
+}
+
+.left-top {
+  position: absolute;
+  top: 20px;
+  left: 30px;
 }
 </style>

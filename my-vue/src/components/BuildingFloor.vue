@@ -46,6 +46,7 @@
     <el-button type="primary" class="enter-button" @click="goin"> </el-button>
     <el-button type="primary" class="enter-button1" @click="goin"> </el-button>
     <el-button type="primary" class="enter-button2" @click="goin"> </el-button>
+    <el-button type="primary" class="goon-button" @click="goon"> </el-button>
   </div>
 </template>
 
@@ -69,6 +70,9 @@ export default {
     },
     goin() {
       this.$router.push("/classroom");
+    },
+    goon() {
+      this.$router.push("/second");
     },
   },
 };
@@ -160,6 +164,19 @@ export default {
   border: none;
 }
 .enter-button2:hover {
+  background-color: transparent;
+}
+
+.goon-button {
+  position: absolute;
+  top: 53.5%;
+  right: 4.3%;
+  width: 86px;
+  height: 90px;
+  background-color: transparent;
+  border: none;
+}
+.goon-button:hover {
   background-color: transparent;
 }
 </style>

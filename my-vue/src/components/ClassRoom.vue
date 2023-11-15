@@ -5,21 +5,55 @@
         :src="require('@/assets/class.png')"
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
+      <PersonalDia ref="infoRef1"></PersonalDia>
+      <InfoDia ref="infoRef2"></InfoDia>
     </el-main>
     <el-button type="primary" class="enter-button" @click="study"> </el-button>
     <el-button type="primary" class="back-button" @click="exit"> </el-button>
+    <div class="left-top">
+      <el-button
+        type="primary"
+        circle
+        class="button-class"
+        @click="showPersonalDialog"
+      >
+        <el-icon style="vertical-align: middle">
+          <User />
+        </el-icon>
+      </el-button>
+
+      <el-button
+        type="primary"
+        circle
+        class="button-class"
+        @click="showInfoDia"
+      >
+        <el-icon style="vertical-align: middle">
+          <MoreFilled />
+        </el-icon>
+      </el-button>
+    </div>
   </div>
 </template>
 
 <script>
+import PersonalDia from "./UserInfo.vue";
+import InfoDia from "./MoreInfo.vue";
+
 export default {
-  components: {},
+  components: { PersonalDia, InfoDia },
   methods: {
     study() {
       this.$router.push("/study");
     },
     exit() {
       this.$router.push("/floor");
+    },
+    showPersonalDialog() {
+      this.$refs.infoRef1.open();
+    },
+    showInfoDia() {
+      this.$refs.infoRef2.open();
     },
   },
 };
@@ -62,5 +96,17 @@ export default {
 }
 .back-button:hover {
   background-color: transparent;
+}
+.button-class {
+  display: inline-block;
+  min-width: 50px;
+  height: 50px;
+  font-size: 24px;
+}
+
+.left-top {
+  position: absolute;
+  top: 20px;
+  left: 30px;
 }
 </style>
