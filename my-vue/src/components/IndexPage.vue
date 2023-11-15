@@ -66,8 +66,8 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { reactive } from "vue";
-import instance from "@/axios";
-import { ElMessage } from "element-plus";
+//import instance from "@/axios";
+//import { ElMessage } from "element-plus";
 import LunBo from "./LunBo.vue";
 
 const router = useRouter();
@@ -77,7 +77,7 @@ const form = reactive({
   password: "",
 });
 
-const login = async () => {
+/*const login = async () => {
   instance
     .post("/login", {
       name: form.name,
@@ -90,6 +90,10 @@ const login = async () => {
         ElMessage.error(res.data.message);
       }
     });
+};*/
+
+const login = async () => {
+  await router.push("/building");
 };
 const register = async () => {
   await router.push("/register");
