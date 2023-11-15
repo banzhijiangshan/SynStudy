@@ -66,6 +66,7 @@ export default {
       this.$refs.infoRef.open();
     },
     logout() {
+      instance.post("/logout");
       this.$router.push("/");
       ElMessage({
         message: "Goodbye!Have a nice day in your real life!",
