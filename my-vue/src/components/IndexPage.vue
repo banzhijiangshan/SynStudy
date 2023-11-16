@@ -86,6 +86,7 @@ const login = async () => {
     .then((res) => {
       if (res.data.code === 200) {
         router.push("/building");
+        getStudentName();
       } else {
         ElMessage.error(res.data.message);
       }
@@ -97,6 +98,17 @@ const login = async () => {
 };*/
 const register = async () => {
   await router.push("/register");
+};
+
+const getStudentName = async () => {
+  instance.get("/getStudentName").then((res) => {
+    if (res.data.code === 200) {
+      ElMessage({
+        message: "欢迎" + res.data.name + "同学!",
+        type: "success",
+      });
+    }
+  });
 };
 </script>
 

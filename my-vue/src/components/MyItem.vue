@@ -23,9 +23,7 @@ export default {
       this.checkTodo(id);
     },
     handleDelete(id) {
-      if (confirm("确定删除吗？")) {
-        this.deleteTodo(id);
-      }
+      this.deleteTodo(id);
     },
   },
 };

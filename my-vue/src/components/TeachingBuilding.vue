@@ -58,9 +58,6 @@ export default {
     PersonalDia,
     InfoDia,
   },
-  mounted() {
-    this.getStudentName();
-  },
   methods: {
     showPersonalDialog() {
       this.$refs.infoRef.open();
@@ -78,16 +75,6 @@ export default {
     },
     showInfoDia() {
       this.$refs.infoRef1.open();
-    },
-    getStudentName() {
-      instance.get("/getStudentName").then((res) => {
-        if (res.data.code === 200) {
-          ElMessage({
-            message: "欢迎" + res.data.name + "同学!",
-            type: "success",
-          });
-        }
-      });
     },
   },
 };
