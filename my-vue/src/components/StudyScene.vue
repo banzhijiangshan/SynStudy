@@ -15,7 +15,7 @@
       <el-button type="info" class="board-button"> 黑板 </el-button>
       <el-button type="primary" class="back-button" @click="outclass">
       </el-button>
-      <ClockCounter class="myclk"></ClockCounter>
+      <ClockCounter class="myclk" ref="clockref"></ClockCounter>
     </el-main>
     <!-- 左上角的按钮组 -->
     <div class="left-top">
@@ -41,6 +41,7 @@
         </el-icon>
       </el-button>
     </div>
+    <h2 class="titlenum">{{ studytogether }}</h2>
   </div>
 </template>
 
@@ -49,6 +50,7 @@ import PlanTable from "./PlanTable.vue";
 import PersonalDia from "./UserInfo.vue";
 import InfoDia from "./MoreInfo.vue";
 import ClockCounter from "./ClockCounter.vue";
+import instance from "@/axios";
 
 export default {
   components: {
@@ -56,6 +58,21 @@ export default {
     PersonalDia,
     InfoDia,
     ClockCounter,
+  },
+  data() {
+    return {
+      studytogether: 0,
+      timer: null,
+    };
+  },
+  freshData() {
+    instance.get("/getStudyInfo").then((res) => {
+      this.studytogether = res.data.studytogether;
+    });
+  },
+  mounted() {
+    this.freshData();
+    this.timer = setInterval(this.freshData, 5000);
   },
   methods: {
     //添加todo
@@ -90,6 +107,10 @@ export default {
       this.$refs.infoRef.open();
     },
     outclass() {
+      instance.post("/timeIncrease", {
+        min: this.$refs.clockref.min,
+        sec: this.$refs.clockref.sec,
+      });
       this.$router.push("/classroom");
     },
     showPersonalDialog() {
@@ -165,5 +186,15 @@ export default {
   position: absolute;
   top: 4.3%;
   left: 52.7%;
+}
+
+.titlenum {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  color: #ffffff;
+  font-family: STLiti, serif;
 }
 </style>

@@ -43,9 +43,9 @@
         </el-button>
       </div>
     </el-row>
-    <el-button type="primary" class="enter-button" @click="goin"> </el-button>
-    <el-button type="primary" class="enter-button1" @click="goin"> </el-button>
-    <el-button type="primary" class="enter-button2" @click="goin"> </el-button>
+    <el-button type="primary" class="enter-button" @click="goin1"> </el-button>
+    <el-button type="primary" class="enter-button1" @click="goin2"> </el-button>
+    <el-button type="primary" class="enter-button2" @click="goin3"> </el-button>
     <el-button type="primary" class="goon-button" @click="goon"> </el-button>
   </div>
 </template>
@@ -53,6 +53,8 @@
 <script>
 import PersonalDia from "./UserInfo.vue";
 import InfoDia from "./MoreInfo.vue";
+import instance from "@/axios";
+
 export default {
   components: {
     PersonalDia,
@@ -68,8 +70,26 @@ export default {
     showInfoDia() {
       this.$refs.infoRef1.open();
     },
-    goin() {
+    goin1() {
+      //math
+      instance.post("/classRoom", {
+        subject: "math",
+      });
       this.$router.push("/classroom");
+    },
+    goin2() {
+      //phy
+      instance.post("/classRoom", {
+        subject: "phy",
+      });
+      this.$router.push("/classroom");
+    },
+    goin3() {
+      //chem
+      instance.post("/classRoom", {
+        subject: "chem",
+      });
+      this.$router.push("/classRoom");
     },
     goon() {
       this.$router.push("/second");

@@ -33,15 +33,32 @@
         </el-icon>
       </el-button>
     </div>
+    <h2 class="titletime">{{ hour }} 时 {{ min }} 分</h2>
+    <h2 class="titlenum">{{ studytogether }}</h2>
   </div>
 </template>
 
 <script>
 import PersonalDia from "./UserInfo.vue";
 import InfoDia from "./MoreInfo.vue";
+import instance from "@/axios";
 
 export default {
   components: { PersonalDia, InfoDia },
+  data() {
+    return {
+      hour: 0,
+      minute: 0,
+      studytogether: 0,
+    };
+  },
+  mounted() {
+    instance.get("/getStudyInfo").then((res) => {
+      this.hour = res.data.hour;
+      this.minute = res.data.minute;
+      this.studytogether = res.data.studytogether;
+    });
+  },
   methods: {
     study() {
       this.$router.push("/study");
@@ -108,5 +125,25 @@ export default {
   position: absolute;
   top: 20px;
   left: 30px;
+}
+
+.titletime {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 60px;
+  color: white;
+  font-family: STLiti, serif;
+}
+
+.titlenum {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  color: #000000;
+  font-family: STLiti, serif;
 }
 </style>
