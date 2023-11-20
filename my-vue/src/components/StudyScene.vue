@@ -184,14 +184,14 @@ export default {
 
 .myclk {
   position: absolute;
-  top: 4.3%;
-  left: 52.7%;
+  top: 4.2%;
+  left: 52.5%;
 }
 
 .titlenum {
   position: absolute;
-  top: 10%;
-  left: 50%;
+  top: 17.56%;
+  left: 41.6%;
   transform: translate(-50%, -50%);
   font-size: 50px;
   color: #ffffff;

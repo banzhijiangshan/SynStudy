@@ -9,6 +9,10 @@
       <InfoDia ref="infoRef2"></InfoDia>
     </el-main>
     <el-button type="primary" class="enter-button" @click="study"> </el-button>
+    <el-button type="primary" class="enter-button1" @click="study"> </el-button>
+    <el-button type="primary" class="enter-button2" @click="study"> </el-button>
+    <el-button type="primary" class="enter-button3" @click="study"> </el-button>
+    <el-button type="primary" class="enter-button4" @click="study"> </el-button>
     <el-button type="primary" class="back-button" @click="exit"> </el-button>
     <div class="left-top">
       <el-button
@@ -48,7 +52,7 @@ export default {
   data() {
     return {
       hour: 0,
-      minute: 0,
+      min: 0,
       studytogether: 0,
     };
   },
@@ -100,6 +104,70 @@ export default {
   border-color: white;
 }
 
+.enter-button1 {
+  position: absolute;
+  top: 40.5%;
+  left: 68.2%;
+  width: 155px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border: 3px solid transparent;
+  transition: border 0.3s;
+}
+.enter-button1:hover {
+  background-color: transparent;
+  border-color: white;
+}
+
+.enter-button2 {
+  position: absolute;
+  top: 58.86%;
+  left: 40.6%;
+  width: 155px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border: 3px solid transparent;
+  transition: border 0.3s;
+}
+.enter-button2:hover {
+  background-color: transparent;
+  border-color: white;
+}
+
+.enter-button3 {
+  position: absolute;
+  top: 77.2%;
+  left: 29.55%;
+  width: 155px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border: 3px solid transparent;
+  transition: border 0.3s;
+}
+.enter-button3:hover {
+  background-color: transparent;
+  border-color: white;
+}
+
+.enter-button4 {
+  position: absolute;
+  top: 77.2%;
+  left: 68.2%;
+  width: 155px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border: 3px solid transparent;
+  transition: border 0.3s;
+}
+.enter-button4:hover {
+  background-color: transparent;
+  border-color: white;
+}
+
 .back-button {
   position: absolute;
   top: 6.5%;
@@ -108,7 +176,6 @@ export default {
   height: 6%;
   background-color: transparent;
   transform: translate(-50%, -50%);
-
   border: none;
 }
 .back-button:hover {
@@ -129,18 +196,18 @@ export default {
 
 .titletime {
   position: absolute;
-  top: 10%;
-  left: 50%;
+  top: 8.3%;
+  left: 58.2%;
   transform: translate(-50%, -50%);
-  font-size: 60px;
+  font-size: 50px;
   color: white;
   font-family: STLiti, serif;
 }
 
 .titlenum {
   position: absolute;
-  top: 10%;
-  left: 50%;
+  top: 93.3%;
+  left: 41%;
   transform: translate(-50%, -50%);
   font-size: 50px;
   color: #000000;
