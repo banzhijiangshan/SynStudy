@@ -7,7 +7,6 @@ import TeachingBuilding from '../components/TeachingBuilding.vue';
 import ClassRoom from '../components/ClassRoom.vue';
 import StudyScene from '../components/StudyScene.vue';
 import SecondFloor from '../components/SecondFloor.vue';
-import ClockCounter from '../components/ClockCounter.vue';
 
 
 const router = createRouter({
@@ -21,7 +20,6 @@ const router = createRouter({
     { path:'/classroom',component:ClassRoom },
     { path:'/study',component:StudyScene },
     { path:'/second',component:SecondFloor },
-    { path:'/clock',component:ClockCounter },
   ],
 });
 

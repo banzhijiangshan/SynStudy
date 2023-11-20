@@ -5,16 +5,41 @@
       <PersonalDia ref="infoRef1"></PersonalDia>
       <InfoDia ref="infoRef2"></InfoDia>
       <el-image
-        :src="require('@/assets/study.png')"
+        :src="currentScene"
+        alt="Current Scene"
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
+
       <el-button type="primary" class="plan-button" @click="plan">
         我的计划
       </el-button>
-      <el-button type="primary" class="shift-button"> 切换场景 </el-button>
+      <el-button type="primary" class="shift-button" @click="showSceneDialog">
+        切换场景
+      </el-button>
       <el-button type="info" class="board-button"> 黑板 </el-button>
       <el-button type="primary" class="back-button" @click="outclass">
       </el-button>
+
+      <el-dialog
+        title="选择虚拟场景"
+        v-model="dialogVis"
+        width="55%"
+        center="true"
+      >
+        <div class="scene-grid">
+          <div v-for="(scene, index) in scenes" :key="index">
+            <div class="scene-item">
+              <img
+                :src="scene"
+                alt="Scene"
+                class="scene-image"
+                @click="switchScene(index + 1)"
+              />
+              <span class="image-description">{{ descriptions[index] }}</span>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
       <ClockCounter class="myclk" ref="clockref"></ClockCounter>
     </el-main>
     <!-- 左上角的按钮组 -->
@@ -61,14 +86,24 @@ export default {
   },
   data() {
     return {
+      currentScene: require("@/assets/study.png"),
       studytogether: 0,
+      dialogVis: false,
       timer: null,
+      scenes: [
+        require("@/assets/choice1.png"),
+        require("@/assets/choice2.png"),
+        require("@/assets/choice3.png"),
+        require("@/assets/choice4.png"),
+      ],
+      choices: [
+        require("@/assets/study.png"),
+        require("@/assets/study2.png"),
+        require("@/assets/study3.png"),
+        require("@/assets/study4.png"),
+      ],
+      descriptions: ["清晨教室", "书房课桌", "小镇书屋", "傍晚教室"],
     };
-  },
-  freshData() {
-    instance.get("/getStudyInfo").then((res) => {
-      this.studytogether = res.data.studytogether;
-    });
   },
   mounted() {
     this.freshData();
@@ -118,6 +153,18 @@ export default {
     },
     showInfoDia() {
       this.$refs.infoRef2.open();
+    },
+    freshData() {
+      instance.get("/getStudyInfo").then((res) => {
+        this.studytogether = res.data.studytogether;
+      });
+    },
+    showSceneDialog() {
+      this.dialogVis = true;
+    },
+    switchScene(index) {
+      this.currentScene = this.choices[index - 1]; // Use index to get the corresponding choice
+      this.dialogVis = false;
     },
   },
 };
@@ -196,5 +243,29 @@ export default {
   font-size: 50px;
   color: #ffffff;
   font-family: STLiti, serif;
+}
+
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.scene-image {
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.scene-image:hover {
+  border: 6px solid #1677ff;
+}
+.scene-item {
+  position: relative;
+}
+.image-description {
+  position: relative;
+  left: 42%;
+  font-family: "Arial";
 }
 </style>

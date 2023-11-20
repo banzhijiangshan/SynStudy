@@ -94,7 +94,7 @@ const login = async () => {
 };
 
 /*const login = async () => {
-  await router.push("/building");
+  await router.push("/background");
 };*/
 const register = async () => {
   await router.push("/register");
