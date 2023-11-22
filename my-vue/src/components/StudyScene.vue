@@ -156,7 +156,7 @@ export default {
     },
     freshData() {
       instance.get("/getStudyInfo").then((res) => {
-        this.studytogether = res.data.studytogether;
+        this.studytogether = res.data.studyInfo.studytogether;
       });
     },
     showSceneDialog() {

@@ -34,8 +34,8 @@
             <el-form-item label="密码" prop="password">
               <el-input v-model="form.password"></el-input>
             </el-form-item>
-            <el-form-item label="用户名" prop="nickname">
-              <el-input v-model="form.nickname"></el-input>
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="form.username"></el-input>
             </el-form-item>
             <el-form-item label="年龄" prop="age">
               <el-input v-model="form.age"></el-input>
@@ -104,7 +104,7 @@ export default {
       imageUrl: "",
       form: {
         password: "",
-        nickname: "",
+        username: "",
         age: Number,
         sex: Number,
         email: "",
@@ -116,7 +116,7 @@ export default {
         phone: "",
       },
       rules: {
-        nickname: [
+        username: [
           { required: true, message: "用户名不能为空", trigger: "blur" },
         ],
         password: [
@@ -135,22 +135,22 @@ export default {
     },
     load() {
       instance.get("/getUserInfo").then((res) => {
-        this.imageUrl = res.data.avatar;
-        this.form.password = res.data.password;
-        this.form.nickname = res.data.nickname;
-        this.form.age = res.data.age;
-        if (res.data.sex === 0) {
+        this.imageUrl = res.data.userInfo.avatar;
+        this.form.password = res.data.userInfo.password;
+        this.form.username = res.data.userInfo.username;
+        this.form.age = res.data.userInfo.age;
+        if (res.data.userInfo.sex === 0) {
           this.form.sex = false;
-        } else if (res.data.sex === 1) {
+        } else if (res.data.userInfo.sex === 1) {
           this.form.sex = true;
         }
-        this.form.email = res.data.email;
-        this.form.id = res.data.id;
-        this.form.area = res.data.area;
-        this.form.hobby = res.data.hobby;
-        this.form.work = res.data.work;
-        this.form.design = res.data.design;
-        this.form.phone = res.data.phone;
+        this.form.email = res.data.userInfo.email;
+        this.form.id = res.data.userInfo.id;
+        this.form.area = res.data.userInfo.area;
+        this.form.hobby = res.data.userInfo.hobby;
+        this.form.work = res.data.userInfo.work;
+        this.form.design = res.data.userInfo.design;
+        this.form.phone = res.data.userInfo.phone;
       });
     },
     submit() {
