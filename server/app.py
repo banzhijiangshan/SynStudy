@@ -81,7 +81,8 @@ def get_user_info():
     user_info = database.fetch_user_info(id)
     user_info['id'] = id + 10000
     print(type(user_info))
-    user_info['password'] = str(user_info['password'])  # bytes cannot be jsonified
+    # remove password from dict user_info
+    user_info.pop('password', None)
     print(user_info)
     if user_info['image'] == None:
         image_url = None
