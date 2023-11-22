@@ -110,6 +110,10 @@ const form = reactive({
 const router = useRouter();
 
 const commit = async () => {
+  if (form.password !== form.repeatpassword) {
+    ElMessage.error("两次输入的密码不一致");
+    return;
+  }
   instance
     .post("/register", {
       name: form.name,

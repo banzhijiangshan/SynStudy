@@ -234,8 +234,8 @@ export default {
 
 .myclk {
   position: absolute;
-  top: 4.2%;
-  left: 54.5%;
+  top: 4.33%;
+  left: 56%;
 }
 
 .titlenum {

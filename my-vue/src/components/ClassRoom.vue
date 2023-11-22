@@ -59,7 +59,7 @@ export default {
   mounted() {
     instance.get("/getStudyInfo").then((res) => {
       this.hour = res.data.studyInfo.hour;
-      this.minute = res.data.studyInfo.minute;
+      this.min = res.data.studyInfo.minute;
       this.studytogether = res.data.studyInfo.studytogether;
     });
   },

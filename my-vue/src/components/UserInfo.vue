@@ -191,7 +191,7 @@ export default {
 
 <style scoped>
 .updateinfo {
-  height: 390px;
+  height: 380px;
   overflow: auto;
 }
 .left {
