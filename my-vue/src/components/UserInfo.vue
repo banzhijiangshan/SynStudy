@@ -126,7 +126,7 @@ export default {
     };
   },
   mounted() {
-    // this.load();
+    this.load();
     this.dialogVisible = false;
   },
   methods: {
@@ -135,7 +135,7 @@ export default {
     },
     load() {
       instance.get("/getUserInfo").then((res) => {
-        this.imageUrl = res.data.userInfo.avatar;
+        this.imageUrl = res.data.userInfo.image;
         this.form.password = res.data.userInfo.password;
         this.form.username = res.data.userInfo.username;
         this.form.age = res.data.userInfo.age;

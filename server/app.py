@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
+from flask import url_for
 
 from werkzeug.utils import secure_filename
 
@@ -50,7 +51,7 @@ def login():
     elif not bcrypt.check_password_hash(correct_pwd, password):
         return jsonify(code=401, message="Incorrect password!")
     else:
-        session['user_id'] = id
+        session['user_id'] = int(id)
         return jsonify(code=200, message="Login successful")
 
 @app.route('/logout', methods=['POST',])
@@ -79,6 +80,16 @@ def get_user_info():
     id = session.get('user_id')
     user_info = database.fetch_user_info(id)
     user_info['id'] = id + 10000
+    print(type(user_info))
+    user_info['password'] = str(user_info['password'])  # bytes cannot be jsonified
+    print(user_info)
+    if user_info['image'] == None:
+        image_url = None
+    else:
+        image_url = url_for('static', filename=user_info['image'])
+    #user_info['image'] = 'http://localhost:5001/' + user_info['image']
+    user_info['image'] = image_url
+    print(user_info['image'])
     if user_info == None:
         return jsonify(code=401, message="id error")
     else:
@@ -99,21 +110,29 @@ def update_user_info():
 @app.route('/uploadAvatar', methods=['POST',])
 def upload_avatar():
     # Check if the request has the file part
-    if 'image' not in request.files:
+    print(request.files)
+    if 'file' not in request.files:
         return jsonify(code=400, message="No file part")
-    print(type(request.files))
-    
-    file = request.files['image']
+
+    file = request.files['file']
+    print(type(file))
+    print(file)
+
 
     # If the user does not select a file, the browser submits an
     # empty file without a filename.
+    print(file.filename)
     if file.filename == '':
         return jsonify(code=400, message="No selected file")
 
     if file:
         filename = secure_filename(file.filename)
-        save_path = os.path.join('user_pics', filename)
-        file.save(filename, save_path)
+        save_path = os.path.join('static/user_pics', filename)
+        # save save_path to database
+        id = session.get('user_id')
+        database.update_user_info(id, {'image': save_path[7:]})
+
+        file.save(save_path)
         return jsonify(code=200, message="Upload avatar successful")
 
 @app.route('/classRoom', methods=['POST',])
@@ -135,7 +154,7 @@ def enter_classroom():
             return jsonify(code=409, message="Classroom full!")
         return jsonify(code=200, message="Enter classroom successful")
     
-@app.route('/outClassRoom', methods=['POST',])
+@app.route('/exitClassRoom', methods=['POST',])
 def leave_classroom():
     id = session.get('user_id')
     classroom_id = session.get('classroom_id')
@@ -152,8 +171,25 @@ def leave_classroom():
    
 @app.route('/getStudyInfo', methods=['GET',])
 def get_study_info():
-    #TODO
-    return jsonify(code = 200, message='Get success', studyInfo={})
+    # get study time using id
+    id = session.get('user_id')
+    hours, mins = database.get_study_time(id)
+    # get online_num using classroom_id
+    classroom_id = session.get('classroom_id')
+    online_num = database.get_online_num(classroom_id)
+
+    return jsonify(code = 200, message='Get success', studyInfo={'hour':hours, 'minute':mins, 'studytogether':online_num})
+
+@app.route('/timeIncrease', methods=['POST',])
+def time_increase():
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    id = session.get('user_id')
+    mins = processed_data['min']
+
+    database.increase_study_time(id, mins)
+    return jsonify(code=200, message="Increase study time successful")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5001')

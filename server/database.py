@@ -42,10 +42,14 @@ def create_db():
                   design VARCHAR(255) DEFAULT NULL,
                   phone VARCHAR(30) DEFAULT NULL,
                   image VARCHAR(255) DEFAULT NULL,
+                  time INTEGER DEFAULT 0,
                   classroom_id INTEGER DEFAULT NULL,
                   FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''') 
 
-    
+    # add math, phy, chem classrooms
+    c.execute("INSERT INTO classrooms (subject) VALUES ('math')")
+    c.execute("INSERT INTO classrooms (subject) VALUES ('phy')")
+    c.execute("INSERT INTO classrooms (subject) VALUES ('chem')")
 
     conn.commit()
     conn.close()
@@ -135,6 +139,7 @@ def fetch_user_info(id):
     query = "SELECT * FROM users WHERE id = ?"
     cursor.execute(query, (id,))
 
+
     result = dict(cursor.fetchone())  # returns a tuple
     conn.close()
 
@@ -207,6 +212,52 @@ def leave_classroom(id, classroom_id):
 
     conn.commit()
     conn.close()
+
+def get_study_time(id):
+    """
+    根据id获取用户学习时间
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "SELECT time FROM users WHERE id = ?"
+    cursor.execute(query, (id,))
+
+    result = cursor.fetchone()
+    conn.close()
+    mins = result[0]
+    hours = mins // 60 # 整除
+    mins = mins % 60   # 取余
+
+    return (hours, mins)
+
+def increase_study_time(id, mins):
+    """
+    根据id和增加的分钟数增加用户学习时间
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "UPDATE users SET time = time + " + str(mins) + " WHERE id = " + str(id)
+    cursor.execute(query)
+
+    conn.commit()
+    conn.close()
+
+def get_online_num(classroom_id):
+    """
+    根据classroom_id获取在线人数
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "SELECT online_num FROM classrooms WHERE id = ?"
+    cursor.execute(query, (classroom_id,))
+
+    result = cursor.fetchone()
+    conn.close()
+
+    return result[0] if result else None
 
 if __name__ == "__main__":
     create_db()
