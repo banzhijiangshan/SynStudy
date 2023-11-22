@@ -68,7 +68,7 @@ export default {
       this.$router.push("/study");
     },
     exit() {
-      instance.post("/exitClassroom");
+      instance.post("/exitClassRoom");
       this.$router.push("/floor");
     },
     showPersonalDialog() {
