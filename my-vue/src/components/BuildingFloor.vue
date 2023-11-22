@@ -4,7 +4,11 @@
       <PersonalDia ref="infoRef"></PersonalDia>
       <InfoDia ref="infoRef1"></InfoDia>
       <el-image
-        :src="require('@/assets/floorday.png')"
+        :src="
+          isDay
+            ? require('@/assets/floorday.png')
+            : require('@/assets/night1.png')
+        "
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
     </el-main>
@@ -59,6 +63,19 @@ export default {
   components: {
     PersonalDia,
     InfoDia,
+  },
+  data() {
+    return {
+      isDay: true,
+    };
+  },
+  mounted() {
+    const currentTime = new Date().getHours();
+    if (currentTime >= 6 && currentTime < 18) {
+      this.isDay = true;
+    } else {
+      this.isDay = false;
+    }
   },
   methods: {
     showPersonalDialog() {
