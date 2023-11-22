@@ -31,9 +31,9 @@
                 <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
-            <el-form-item label="密码" prop="password">
+            <!--<el-form-item label="密码" prop="password">
               <el-input v-model="form.password"></el-input>
-            </el-form-item>
+            </el-form-item>-->
             <el-form-item label="用户名" prop="username">
               <el-input v-model="form.username"></el-input>
             </el-form-item>
@@ -103,9 +103,8 @@ export default {
       dialogVisible: false,
       imageUrl: "",
       form: {
-        password: "",
+        //password: "",
         username: "",
-
         age: Number,
         sex: Number,
         email: "",
@@ -120,9 +119,9 @@ export default {
         username: [
           { required: true, message: "用户名不能为空", trigger: "blur" },
         ],
-        password: [
-          { required: true, message: "密码不能为空", trigger: "blur" },
-        ],
+        //password: [
+        //{ required: true, message: "密码不能为空", trigger: "blur" },
+        //],
       },
     };
   },
@@ -137,7 +136,7 @@ export default {
     load() {
       instance.get("/getUserInfo").then((res) => {
         this.imageUrl = res.data.userInfo.image;
-        this.form.password = res.data.userInfo.password;
+        //this.form.password = res.data.userInfo.password;
         this.form.username = res.data.userInfo.username;
         this.form.age = res.data.userInfo.age;
         if (res.data.userInfo.sex === 0) {

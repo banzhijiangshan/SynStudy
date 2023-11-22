@@ -167,6 +167,9 @@ export default {
       this.dialogVis = false;
     },
   },
+  beforeUnmount() {
+    clearInterval(this.timer);
+  },
 };
 </script>
 
@@ -232,7 +235,7 @@ export default {
 .myclk {
   position: absolute;
   top: 4.2%;
-  left: 52.5%;
+  left: 54.5%;
 }
 
 .titlenum {
