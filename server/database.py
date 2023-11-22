@@ -155,7 +155,7 @@ def update_user_info(id, data):
     query = "UPDATE users SET "
     # do when data[key] is not None
     for key in data:
-        if data[key] != None:
+        if data[key] != None and key != 'id':
             query += key + " = '" + str(data[key]) + "', "
 
 
