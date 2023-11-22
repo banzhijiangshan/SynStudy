@@ -31,9 +31,9 @@
                 <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
-            <el-form-item label="密码" prop="password">
+            <!--<el-form-item label="密码" prop="password">
               <el-input v-model="form.password"></el-input>
-            </el-form-item>
+            </el-form-item>-->
             <el-form-item label="用户名" prop="nickname">
               <el-input v-model="form.nickname"></el-input>
             </el-form-item>
@@ -103,7 +103,7 @@ export default {
       dialogVisible: false,
       imageUrl: "",
       form: {
-        password: "",
+        //password: "",
         nickname: "",
         age: Number,
         sex: Number,
@@ -136,7 +136,7 @@ export default {
     load() {
       instance.get("/getUserInfo").then((res) => {
         this.imageUrl = res.data.avatar;
-        this.form.password = res.data.password;
+        //this.form.password = res.data.password;
         this.form.nickname = res.data.nickname;
         this.form.age = res.data.age;
         if (res.data.sex === 0) {
@@ -177,10 +177,10 @@ export default {
     },
     beforeAvatarUpload(rawFile) {
       if (rawFile.type !== "image/jpeg") {
-        this.$message.error("Avatar picture must be JPG format!");
+        ElMessage.error("Avatar picture must be JPG format!");
         return false;
       } else if (rawFile.size / 1024 / 1024 > 2) {
-        this.$message.error("Avatar picture size cannot exceed 2MB!");
+        ElMessage.error("Avatar picture size can not exceed 2MB!");
         return false;
       }
       return true;
