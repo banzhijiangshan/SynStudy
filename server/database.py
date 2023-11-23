@@ -17,7 +17,8 @@ def create_db():
     conn = sqlite3.connect("user_data.db")
     c = conn.cursor()
 
-    # create a database for virtual classrooms, (id, subject, online people numbers, online people id)
+    # create a database for virtual classrooms,
+    # (id, subject, online people numbers, online people id)
     c.execute('''DROP TABLE IF EXISTS classrooms''')
     c.execute('''CREATE TABLE IF NOT EXISTS classrooms
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +45,7 @@ def create_db():
                   image VARCHAR(255) DEFAULT NULL,
                   time INTEGER DEFAULT 0,
                   classroom_id INTEGER DEFAULT NULL,
-                  FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''') 
+                  FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
 
     # add math, phy, chem classrooms
     c.execute("INSERT INTO classrooms (subject) VALUES ('math')")
@@ -53,6 +54,7 @@ def create_db():
 
     conn.commit()
     conn.close()
+
 
 def insert_register_data(data):
     """
@@ -65,10 +67,12 @@ def insert_register_data(data):
     password = data["password"]
     email = data["email"]
 
-    c.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)", (username, password, email))
+    c.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
+              (username, password, email))
 
     conn.commit()
     conn.close()
+
 
 def fetch_pw_and_id(user_input):
     """
@@ -81,7 +85,7 @@ def fetch_pw_and_id(user_input):
     if re.match(r"[^@]+@[^@]+\.[^@]+", user_input):
         query = "SELECT password, id FROM users WHERE email = ?"
         cursor.execute(query, (user_input,))
-        result = cursor.fetchone()  # will return a tuple even if only returns one column
+        result = cursor.fetchone()  # will return a tuple
         conn.close()
 
         pw = result[0] if result else None
@@ -103,7 +107,7 @@ def fetch_pw_and_id(user_input):
         cursor.execute(query, ((int(user_input) - 10000),))
         result = cursor.fetchone()
         conn.close()
-        
+
         pw = result[0] if result else None
         id = int(user_input) - 10000
 
@@ -111,6 +115,7 @@ def fetch_pw_and_id(user_input):
         return (None, None)
 
     return (pw, id)
+
 
 def fetch_cur_cnt():
     """
@@ -127,6 +132,7 @@ def fetch_cur_cnt():
 
     return result[0] if result else None
 
+
 def fetch_user_info(id):
     """
     根据id获取用户信息
@@ -138,11 +144,11 @@ def fetch_user_info(id):
     query = "SELECT * FROM users WHERE id = ?"
     cursor.execute(query, (id,))
 
-
     result = dict(cursor.fetchone())  # returns a tuple
     conn.close()
 
     return result if result else None
+
 
 def update_user_info(id, data):
     """
@@ -154,9 +160,8 @@ def update_user_info(id, data):
     query = "UPDATE users SET "
     # do when data[key] is not None
     for key in data:
-        if data[key] != None and key != 'id':
+        if data[key] is not None and key != 'id':
             query += key + " = '" + str(data[key]) + "', "
-
 
     # only set to given id
     query = query[:-2] + " WHERE id = " + str(id)
@@ -164,6 +169,7 @@ def update_user_info(id, data):
 
     conn.commit()
     conn.close()
+
 
 def get_classroom_id(subject):
     """
@@ -180,6 +186,7 @@ def get_classroom_id(subject):
 
     return result[0] if result else None
 
+
 def enter_classroom(id, classroom_id):
     """
     根据id和class_id修改用户信息和classroom信息
@@ -187,14 +194,17 @@ def enter_classroom(id, classroom_id):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
-    query = "UPDATE users SET classroom_id = " + str(classroom_id) + " WHERE id = " + str(id)
+    query = "UPDATE users SET classroom_id = " + \
+        str(classroom_id) + " WHERE id = " + str(id)
     cursor.execute(query)
 
-    query = "UPDATE classrooms SET online_num = online_num + 1 WHERE id = " + str(classroom_id)
+    query = "UPDATE classrooms SET online_num = online_num + 1 WHERE id = " + \
+        str(classroom_id)
     cursor.execute(query)
 
     conn.commit()
     conn.close()
+
 
 def leave_classroom(id, classroom_id):
     """
@@ -206,11 +216,13 @@ def leave_classroom(id, classroom_id):
     query = "UPDATE users SET classroom_id = NULL WHERE id = " + str(id)
     cursor.execute(query)
 
-    query = "UPDATE classrooms SET online_num = online_num - 1 WHERE id = " + str(classroom_id)
+    query = "UPDATE classrooms SET online_num = online_num - 1 WHERE id = " + \
+        str(classroom_id)
     cursor.execute(query)
 
     conn.commit()
     conn.close()
+
 
 def get_study_time(id):
     """
@@ -225,10 +237,11 @@ def get_study_time(id):
     result = cursor.fetchone()
     conn.close()
     mins = result[0]
-    hours = mins // 60 # 整除
+    hours = mins // 60  # 整除
     mins = mins % 60   # 取余
 
     return (hours, mins)
+
 
 def increase_study_time(id, mins):
     """
@@ -237,11 +250,13 @@ def increase_study_time(id, mins):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
-    query = "UPDATE users SET time = time + " + str(mins) + " WHERE id = " + str(id)
+    query = "UPDATE users SET time = time + " + \
+        str(mins) + " WHERE id = " + str(id)
     cursor.execute(query)
 
     conn.commit()
     conn.close()
+
 
 def get_online_num(classroom_id):
     """
@@ -258,6 +273,6 @@ def get_online_num(classroom_id):
 
     return result[0] if result else None
 
+
 if __name__ == "__main__":
     create_db()
-
