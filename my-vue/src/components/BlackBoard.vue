@@ -1,0 +1,817 @@
+<template>
+  <div>
+    <el-dialog
+      title=""
+      v-model="dialogVisible"
+      width="70%"
+      :height="400"
+      :before-close="handleClose"
+      :show-close="false"
+    >
+      <el-button type="primary" class="back-button" @click="backToStudy">
+      </el-button>
+
+      <el-button type="primary" ref="buttonRef" class="new-button"> </el-button>
+      <el-button
+        type="primary"
+        style="margin-left: 16px"
+        @click="drawer = true"
+        class="read-button"
+      >
+        open
+      </el-button>
+      <el-popover
+        ref="popoverRef"
+        :virtual-ref="buttonRef"
+        trigger="click"
+        title="写一个新问题"
+        :width="450"
+        center="true"
+        virtual-triggering
+        placement="top"
+        align="center"
+        :class="{ 'centered-title': isPopoverVisible }"
+      >
+        <el-form :model="questionForm" label-width="80px">
+          <el-form-item label="简述:">
+            <el-input
+              v-model="questionForm.title"
+              class="titleInput"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="内容:">
+            <el-input
+              v-model="questionForm.content"
+              class="contentInput"
+            ></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="submitQuestion"
+              class="submit-button"
+              >提交</el-button
+            >
+          </el-form-item>
+        </el-form>
+      </el-popover>
+      <ul
+        class="list"
+        v-infinite-scroll="load"
+        style="overflow: auto"
+        infinite-scroll-immediate="false"
+        v-loading="loading"
+      >
+        <li
+          v-for="(item, index) in allQuestions"
+          class="list-item"
+          :key="index"
+        >
+          <div class="list-top">
+            <img :src="item.imageUrl" />
+            <div style="margin-left: 6px; color: #2073e3; float: left">
+              <span style="float: left">{{ item.userName }}</span>
+              <div style="width: 200px"></div>
+              <span
+                style="
+                  float: left;
+                  font-size: 15px;
+                  align-items: center;
+                  display: flex;
+                  color: #a426ce;
+                "
+              >
+                {{ item.askTime }}
+              </span>
+            </div>
+          </div>
+
+          <div class="list-main">
+            <div class="list-main-text">
+              <p>简述：{{ item.titleContent }}</p>
+            </div>
+            <!--<div class="list-main-img">
+              <div v-for="img in item.imgUrls">
+                <el-image
+                  :src="img"
+                  fit="cover"
+                  :preview-src-list="item.imgUrls"
+                  @click="addClick(item.id)"
+                ></el-image>
+              </div>
+            </div>-->
+            <div style="width: 100%"></div>
+          </div>
+
+          <div class="list-bottom">
+            <!--评论-->
+            <span @click="toComment(item.id)"> 问题详情 </span>
+          </div>
+        </li>
+      </ul>
+    </el-dialog>
+
+    <!--详情区-->
+
+    <el-drawer v-model="drawer" :direction="direction">
+      <template #header>
+        <h2>问题详情</h2>
+      </template>
+      <template #default>
+        <div class="list-top">
+          <img :src="avatarUrl" />
+          <div style="margin-left: 6px; color: #2073e3; float: left">
+            <span style="float: left">{{ currentAsker }}</span>
+            <div style="width: 200px"></div>
+            <span
+              style="
+                float: left;
+                font-size: 15px;
+                align-items: center;
+                display: flex;
+                color: #a426ce;
+              "
+            >
+              {{ currentAskTime }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-content">
+          <textarea
+            v-model="currentContent"
+            style="width: 100%; height: 200px; resize: none"
+            readonly
+            class="styled-textarea"
+          >
+          </textarea>
+        </div>
+
+        <div class="inputComment">
+          <textarea
+            v-model="textareaContent"
+            placeholder="说点什么..."
+            maxlength="200"
+            @input="calcInput"
+          >
+          </textarea>
+          <span
+            style="
+              position: absolute;
+              font-size: 14px;
+              float: left;
+              left: 3%;
+              bottom: 5%;
+            "
+            >还可以输入{{ canInputText }}个字符</span
+          >
+          <span class="sent" @click="sentComment">发送</span>
+        </div>
+
+        <!--评论列表-->
+        <div class="comment-list">
+          <ul class="comment-ul">
+            <li
+              class="comment-li"
+              v-for="(com, index) in currentComments"
+              :key="index"
+            >
+              <div class="comment-li-top">
+                <img :src="com.commenterUrl" />
+                <span class="comment-nickName">{{ com.userName }}</span>
+                <span style="font-size: 15px; margin-left: auto">{{
+                  com.commentTime
+                }}</span>
+                <span
+                  v-if="!com.openReply"
+                  style="cursor: pointer; margin-left: auto; font-size: 16px"
+                  @click="openReply(com, index)"
+                >
+                  回复</span
+                >
+                <span
+                  v-if="com.openReply"
+                  style="cursor: pointer; margin-left: auto; font-size: 16px"
+                  @click="closeReply(index)"
+                >
+                  收起</span
+                >
+              </div>
+
+              <div class="comment-li-content" @click="openReply(com, index)">
+                <span style="text-align: left; float: left; cursor: pointer">{{
+                  com.content
+                }}</span>
+              </div>
+              <div class="inputReply" v-if="com.openReply">
+                <textarea
+                  v-model="com.replyContent"
+                  placeholder="说点什么吧~"
+                  maxlength="200"
+                  @input="calcInputReply(index)"
+                >
+                </textarea>
+                <span style="font-size: 14px; float: left"
+                  >还可以输入{{ com.canInputReply }}个字符</span
+                >
+                <span class="sent" @click="sentReply(com, index)">回复</span>
+              </div>
+              <!--回复列表-->
+              <ul class="reply-ul">
+                <li
+                  class="reply-li"
+                  v-for="(reply, index1) in com.replyies"
+                  :key="index1"
+                >
+                  <div class="reply-li-top">
+                    <img :src="reply.fromUserAvatarUrl" />
+                    <span class="reply-nickName"
+                      >{{ reply.fromUserNickName }}
+                      <span
+                        style="
+                          font-size: 15px;
+                          margin: 3px;
+                          color: var(--text-color);
+                        "
+                        >回复</span
+                      >
+                      {{ reply.toUserNickName }}</span
+                    >
+                    <span style="margin-left: auto; font-size: 13px">{{
+                      reply.replyTime
+                    }}</span>
+                  </div>
+                  <div class="reply-li-content">
+                    <span style="float: left">{{ reply.content }}</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </template>
+
+      <template #footer>
+        <div style="flex: auto">
+          <el-button @click="cancelClick">cancel</el-button>
+          <el-button type="primary" @click="confirmClick">confirm</el-button>
+        </div>
+      </template>
+    </el-drawer>
+  </div>
+</template>
+
+<script>
+import instance from "@/axios";
+import { ElMessage } from "element-plus";
+import { ref } from "vue";
+
+export default {
+  name: "BlackBoard",
+  data() {
+    return {
+      currentQuestionId: "",
+      dialogVisible: false,
+      allQuestions: [],
+      page: 0,
+      loadFinished: false,
+      questionForm: {
+        title: "",
+        content: "",
+      },
+      loading: false,
+      currentAsker: "",
+      currentAskTime: "",
+      currentContent:
+        "有ABC三个神,只知他们名为“真实、虚谎、任性”,但不知哪个代号属于哪个名字。真实之神只说真话，虚谎之神只说假话,而任性之神会随机地说真话或假话。我们的任务是找出ABC的身份。我们一共可以问他们三个问题，且问题必须是用“是”或“否回答的问题，每次只能向其中一个神发问但可以问同一个神多个问题。神只会用他们的语言回答“da”或“ja”,其中一个代表“是”，一个代表“否”,但我们不知道哪个回答是哪个意思。如何提问才能区分出三个神的身份?",
+      currentComments: [
+        {
+          id: 1,
+          commenterUrl: "",
+          userName: "",
+          commentTime: "2021-06-01 12:00",
+          content: "这个问题很有意思",
+          openReply: false,
+          replies: [],
+          replyContent: "",
+          canInputReply: 200,
+        },
+      ],
+      avatarUrl: "",
+      canInputText: 200,
+      textareaContent: "",
+      backUrl: "",
+      backUserName: "",
+    };
+  },
+  setup() {
+    const buttonRef = ref(null);
+    const popoverRef = ref(null);
+    const drawer = ref(false);
+
+    return {
+      buttonRef,
+      popoverRef,
+      drawer,
+    };
+  },
+  mounted() {
+    this.dialogVisible = false;
+    this.load();
+  },
+
+  methods: {
+    open() {
+      this.dialogVisible = true;
+    },
+    handleClose() {
+      this.dialogVisible = false;
+      this.$emit("flesh");
+    },
+    backToStudy() {
+      this.dialogVisible = false;
+    },
+
+    //后端回传格式：code, data:{questions:[{id, titleContent, imageUrl, userName, askTime}]}
+    load() {
+      if (this.loadFinished === false) {
+        this.loading = true;
+        instance
+          .post("/getAllQuestions", {
+            page: this.page,
+          })
+          .then((res) => {
+            if (res.data.code === 200) {
+              for (let i = 0; i < res.data.questions.length; i++) {
+                this.allQuestions.push(res.data.questions[i]);
+              }
+              this.lastpage = this.page;
+              this.page += res.data.questions.length;
+              if (res.data.questions.length < 5) {
+                this.loadFinished = true;
+              }
+            }
+            console.log("返回", res);
+            this.loading = false;
+          });
+      } else {
+        this.$message({
+          message: "我是有底线哒~",
+          type: "warning",
+          offset: 900,
+          center: true,
+        });
+      }
+    },
+    submitQuestion() {
+      instance
+        .post("/addQuestion", {
+          title: this.questionForm.title,
+          content: this.questionForm.content,
+        })
+        .then((res) => {
+          if (res.data.code === 200) {
+            ElMessage({
+              message: "提交成功",
+              type: "success",
+            });
+            this.$refs.popoverRef.doClose();
+            this.questionForm.title = "";
+            this.questionForm.content = "";
+            this.loadFinished = false;
+            this.load();
+          }
+        });
+    },
+    //后端回传格式：code, data:{avatarUrl, userName, asktime, content, comments:[{commenterUrl, userName, commentTime, content, replies:[{fromUserAvatarUrl, fromUserNickName, toUserNickName, replyTime, replyContent}]} ]}
+    toComment(id) {
+      instance.post("/getQuestionById", { id: id }).then((res) => {
+        if (res.data.code === 200) {
+          this.currentAsker = res.data.question.userName;
+          this.currentAskTime = res.data.question.askTime;
+          this.currentContent = res.data.question.content;
+          this.currentComments = res.data.question.comments;
+          this.avatarUrl = res.data.question.imageUrl;
+          this.drawer = true;
+          this.currentQuestionId = id;
+        }
+      });
+    },
+    calcInput() {
+      let len = this.textareaContent.length;
+      this.canInputText = 200 - len;
+    },
+    calcInputReply(index) {
+      let len = this.comments[index].replyContent.length;
+      this.$set(this.comments[index], "canInputReply", 200 - len);
+    },
+    sentComment() {
+      let tempComment = this.textareaContent;
+      //请求
+      instance
+        .post("/addComment", {
+          questionId: this.currentQuestionId,
+          content: tempComment,
+        })
+        .then((res) => {
+          if (res.data.code === 200) {
+            this.$message({
+              message: "发送成功",
+              type: "success",
+            });
+            this.textareaContent = "";
+            this.backUrl = res.data.imageUrl;
+            this.backUserName = res.data.userName;
+          } else {
+            this.$message({
+              message: "发送失败",
+              type: "error",
+            });
+          }
+        });
+      //用现有数据更新当前评论区
+      let now = new Date();
+      let year = now.getFullYear();
+      let month = String(now.getMonth() + 1).padStart(2, "0");
+      let day = String(now.getDate()).padStart(2, "0");
+      let hours = String(now.getHours()).padStart(2, "0");
+      let minutes = String(now.getMinutes()).padStart(2, "0");
+      let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
+      let addComment = {
+        commenterUrl: this.backUrl,
+        userName: this.backUserName,
+        commentTime: formattedDateTime,
+        content: tempComment,
+        openReply: false,
+        replyies: [],
+        replyContent: "",
+        canInputReply: 200,
+      };
+      this.currentComments.push(addComment);
+    },
+    openReply(com) {
+      this.$set(com, "openReply", true);
+      this.$set(com, "回复@" + com.nickName);
+    },
+    closeReply(index) {
+      this.$set(this.comments[index], "openReply", false);
+    },
+    sentReply(com, index) {
+      let now = new Date();
+      let year = now.getFullYear();
+      let month = String(now.getMonth() + 1).padStart(2, "0");
+      let day = String(now.getDate()).padStart(2, "0");
+      let hours = String(now.getHours()).padStart(2, "0");
+      let minutes = String(now.getMinutes()).padStart(2, "0");
+      let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
+      let fromUserNickName = "";
+      instance.get("/getStudentName").then((res) => {
+        if (res.data.code === 200) {
+          fromUserNickName = res.data.name;
+        }
+      });
+      let reply = {
+        commentId: com.id,
+        content: com.replyContent,
+        replyTime: formattedDateTime,
+        toUserNickName: com.userName,
+        fromUserNickName: fromUserNickName,
+      };
+      this.currentComments[index].replyies.push(reply);
+      instance.post("/sentReply", reply).then((res) => {
+        if (res.data.code === 200) {
+          this.$set(com, "replyContent", "");
+          this.$set(com, "openReply", false);
+        }
+      });
+    },
+  },
+};
+</script>
+
+<style scoped>
+.back-button {
+  position: absolute;
+  top: 10%;
+  left: 8%;
+  width: 95px;
+  height: 58px;
+  transform: translate(-50%, -50%);
+  border: none;
+  background-color: transparent;
+}
+.back-button:hover {
+  background-color: transparent;
+}
+
+.new-button {
+  position: absolute;
+  top: 90%;
+  left: 83%;
+  width: 65px;
+  height: 50px;
+  transform: translate(-50%, -50%);
+  border: none;
+  background-color: transparent;
+}
+.new-button:hover {
+  background-color: transparent;
+}
+
+.titleInput {
+  width: 300px;
+}
+.contentInput {
+  width: 300px;
+  height: 150px;
+}
+
+.submit-button {
+  position: absolute;
+  margin-top: 15px;
+  left: 67%;
+  width: 70px;
+  height: 35px;
+  border-radius: 3px;
+  border: none;
+}
+
+.read-button {
+  position: absolute;
+  top: 90%;
+  left: 20%;
+  width: 65px;
+  height: 50px;
+  transform: translate(-50%, -50%);
+  border: none;
+}
+
+.styled-textarea {
+  width: 100%;
+  height: 200px;
+  resize: none;
+  border: 2px solid #ccc; /* 添加边框 */
+  border-radius: 10px; /* 圆角 */
+  font-family: Helvetica; /* 字体 */
+  font-size: 14px; /* 字号 */
+  padding: 10px; /* 内边距 */
+  box-sizing: border-box; /* 盒模型 */
+}
+
+.detail-content {
+  margin-top: 10px;
+}
+
+.centered-title .el-popover__title {
+  text-align: center;
+}
+
+>>> .el-dialog {
+  height: 70% !important;
+}
+>>> .el-dialog,
+.el-pager li {
+  background-color: rgba(255, 0, 0, 0);
+  color: #ffffff;
+  background-image: url(../assets/board.png) !important;
+  background-size: 100% 100%;
+}
+.el-dialog__header {
+  padding-top: 10px !important;
+  background-color: rgb(255, 255, 255, 0);
+  border-radius: 14px 14px 0 0;
+}
+.el-dialog__body {
+  border-top: 0 !important;
+  background-color: rgba(19, 31, 59, 0);
+  color: #ffffff;
+}
+.el-dialog__footer {
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.list {
+  position: absolute;
+  margin-top: 4%;
+  margin-left: 10%;
+  list-style-type: none;
+  width: 76%;
+  height: 64%;
+}
+
+.list-item {
+  margin: 3px;
+  color: var(--text-color);
+  border-radius: 10px;
+  padding: 5px;
+  float: left;
+  width: 90%;
+}
+
+.list-top img {
+  width: 45px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: fill;
+}
+
+.list-top {
+  display: flex;
+  align-items: center;
+  width: 300px;
+  flex-wrap: wrap;
+}
+
+.list-main {
+  float: left;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.list-main-text {
+  text-align: left;
+  float: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 700px;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+}
+
+.inputComment {
+  margin-top: 3%;
+  width: 100%;
+  margin-left: 0%;
+  position: relative;
+  height: 185px;
+  border-radius: 13px;
+  padding: 3%;
+  background-color: #f7f2f2;
+  color: var(--text-color);
+}
+
+.inputComment textarea {
+  width: 100%;
+  position: relative;
+  height: 150px;
+  border: 0 solid;
+  outline: none;
+  resize: none;
+  background-color: var(--main-bg-color);
+  color: var(--text-color);
+}
+
+.inputComment .sent {
+  position: absolute;
+  bottom: 4%;
+  right: 3%;
+  border-radius: 15px;
+  background-color: #ee464b;
+  color: white;
+  padding: 2px 15px;
+  font-size: 16px;
+  float: right;
+  cursor: pointer;
+  height: 25px;
+}
+
+.comment-list {
+  width: 100%;
+  border-radius: 14px;
+  margin-top: 4%;
+  height: 72%;
+  position: relative;
+}
+
+.comment-ul {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 99%;
+  position: relative;
+  list-style-type: none;
+  overflow: auto;
+}
+
+.comment-li {
+  margin: 2%;
+  float: left;
+  width: 96%;
+  position: relative;
+  overflow: auto;
+}
+
+.comment-li-top {
+  display: flex;
+  float: left;
+  align-items: center;
+  width: 90%;
+}
+
+.comment-li-top span {
+  margin-left: 8px;
+}
+
+.comment-li img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+.comment-li-content {
+  margin-left: 7%;
+  width: 86%;
+  font-size: 18px;
+  clear: left;
+  float: left;
+  padding: 5px;
+  cursor: pointer;
+  overflow: auto;
+}
+
+.comment-nickName {
+  font-size: 18px;
+  color: #2073e3;
+}
+
+.inputReply {
+  float: left;
+  margin-top: 1%;
+  width: 76%;
+  margin-left: 8%;
+  position: relative;
+  height: 150px;
+  border-radius: 13px;
+  padding: 2%;
+  background-color: var(--main-bg-color);
+  color: var(--text-color);
+}
+
+.inputReply textarea {
+  width: 98%;
+  position: relative;
+  height: 120px;
+  border: 0 solid;
+  outline: none;
+  resize: none;
+  background-color: var(--main-bg-color);
+  color: var(--text-color);
+}
+
+.inputReply .sent {
+  border-radius: 30px;
+  background-color: #ee464b;
+  color: white;
+  padding: 2px 15px;
+  font-size: 16px;
+  float: right;
+  cursor: pointer;
+  height: 25px;
+}
+.reply-ul {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  position: relative;
+  list-style-type: none;
+  overflow: auto;
+}
+
+.reply-li {
+  margin-left: 7%;
+  margin-top: 1%;
+  float: left;
+  width: 92%;
+  position: relative;
+  overflow: auto;
+}
+
+.reply-li-top {
+  display: flex;
+  float: left;
+  align-items: center;
+  width: 90%;
+}
+.reply-li img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+.reply-li-content {
+  margin-left: 8%;
+  width: 82%;
+  font-size: 16px;
+  clear: left;
+  float: left;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.reply-nickName {
+  font-size: 16px;
+  color: #2073e3;
+}
+</style>
