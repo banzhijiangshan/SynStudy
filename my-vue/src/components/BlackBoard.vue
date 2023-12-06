@@ -364,10 +364,18 @@ export default {
       }
     },
     submitQuestion() {
+      let now = new Date();
+      let year = now.getFullYear();
+      let month = String(now.getMonth() + 1).padStart(2, "0");
+      let day = String(now.getDate()).padStart(2, "0");
+      let hours = String(now.getHours()).padStart(2, "0");
+      let minutes = String(now.getMinutes()).padStart(2, "0");
+      let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
       instance
         .post("/addQuestion", {
           title: this.questionForm.title,
           content: this.questionForm.content,
+          askTime: formattedDateTime,
         })
         .then((res) => {
           if (res.data.code === 200) {
@@ -392,9 +400,9 @@ export default {
           this.currentContent = res.data.question.content;
           this.currentComments = res.data.question.comments;
           this.avatarUrl = res.data.question.imageUrl;
-          this.drawer = true;
           this.currentQuestionId = id;
         }
+        this.drawer = true;
       });
     },
     calcInput() {
