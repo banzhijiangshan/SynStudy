@@ -47,6 +47,20 @@ def create_db():
                   classroom_id INTEGER DEFAULT NULL,
                   FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
 
+    c.execute('''DROP TABLE IF EXISTS questions''')
+    # id, user_id, classroom_id, title, tag, content, time
+    c.execute('''CREATE TABLE IF NOT EXISTS questions
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    classroom_id INTEGER NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    tag VARCHAR(255) NOT NULL,
+                    content VARCHAR(255) NOT NULL,
+                    time INTEGER NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
+    
+
     # add math, phy, chem classrooms
     c.execute("INSERT INTO classrooms (subject) VALUES ('math')")
     c.execute("INSERT INTO classrooms (subject) VALUES ('phy')")
@@ -272,6 +286,37 @@ def get_online_num(classroom_id):
     conn.close()
 
     return result[0] if result else None
+
+
+def get_question_list(classroom_id):
+    """
+    获取classroom_id对应的最新的10个问题
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "SELECT id, user_id, title, tag, time FROM questions WHERE classroom_id = ? ORDER BY time DESC LIMIT 10"
+    cursor.execute(query, (classroom_id,))
+
+    result = cursor.fetchall()
+    conn.close()
+
+    return result if result else None
+
+
+def insert_question(question, user_id, classroom_id):
+    """
+    将question插入
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "INSERT INTO questions (user_id, classroom_id, title, tag, content, time) VALUES (?, ?, ?, ?, ?, ?)"
+    cursor.execute(query, (user_id, classroom_id, question["title"],
+                           question["tag"], question["content"], question["time"]))
+
+    conn.commit()
+    conn.close()
 
 
 if __name__ == "__main__":

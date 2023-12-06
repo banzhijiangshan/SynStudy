@@ -217,5 +217,43 @@ def time_increase():
                    message="Increase study time successful")
 
 
+@app.route('/getQuestionList', methods=['GET',])
+def get_question_list():
+    classroom_id = session.get('classroom_id')
+    question_list = database.get_question_list(classroom_id)
+    if question_list is None:
+        return jsonify(code=401, message="list is empty!")
+    else:
+        return jsonify(code=200,
+                       message="Get question successful",
+                       question_list=question_list)
+
+
+@app.route('/getOneQuestion', methods=['POST',])
+def get_question_content():
+    # frontend post the question id needed
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    question_id = processed_data['qid']
+    question_content = database.get_one_question(question_id)
+    if question_content is None:
+        return jsonify(code=404, message="content not found!")
+    else:
+        return jsonify(code=200,
+                       message="Get question successful",
+                       question_content=question_content)
+
+
+@app.route('/insertQuestion', methods=['POST',])
+def insert_question():
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    classroom_id = session.get('classroom_id')
+    user_id = session.get('user_id')
+    database.insert_question(processed_data, user_id, classroom_id)
+    return jsonify(code=200, message="Insert question successful")
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5001')
