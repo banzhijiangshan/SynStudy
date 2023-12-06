@@ -68,8 +68,11 @@ export default {
       this.$router.push("/study");
     },
     exit() {
-      instance.post("/exitClassRoom");
-      this.$router.push("/floor");
+      instance.post("/exitClassRoom").then((res) => {
+        if (res.data.code === 200) {
+          this.$router.push("/floor");
+        }
+      });
     },
     showPersonalDialog() {
       this.$refs.infoRef1.open();
@@ -202,7 +205,7 @@ export default {
   transform: translate(-50%, -50%);
   font-size: 50px;
   color: white;
-  font-family: STLiti, serif;
+  font-family: Helvetica;
 }
 
 .titlenum {
@@ -212,6 +215,6 @@ export default {
   transform: translate(-50%, -50%);
   font-size: 50px;
   color: #000000;
-  font-family: STLiti, serif;
+  font-family: Helvetica;
 }
 </style>

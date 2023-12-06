@@ -88,17 +88,17 @@ def get_user_info():
     id = session.get('user_id')
     user_info = database.fetch_user_info(id)
     user_info['id'] = id + 10000
-    print(type(user_info))
+    # print(type(user_info))
     # remove password from dict user_info
     user_info.pop('password', None)
-    print(user_info)
+    # print(user_info)
     if user_info['image'] is None:
         image_url = None
     else:
         image_url = url_for('static', filename=user_info['image'])
     # user_info['image'] = 'http://localhost:5001/' + user_info['image']
     user_info['image'] = image_url
-    print(user_info['image'])
+    # print(user_info['image'])
     if user_info is None:
         return jsonify(code=401, message="id error")
     else:
@@ -217,43 +217,151 @@ def time_increase():
                    message="Increase study time successful")
 
 
-@app.route('/getQuestionList', methods=['GET',])
+@app.route('/getAllQuestions', methods=['POST',])
 def get_question_list():
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    page = processed_data['page']
     classroom_id = session.get('classroom_id')
-    question_list = database.get_question_list(classroom_id)
+    question_list = database.get_question_list(classroom_id, page)
+
     if question_list is None:
-        return jsonify(code=401, message="list is empty!")
-    else:
-        return jsonify(code=200,
+        return jsonify(code=200, message="list is empty!", questions={})
+
+    # question_list: questions.id, title, image, username, time
+    # processed_question_list: id, titleContent, imageUrl, userName, askTime
+    processed_question_list = []
+    for question in question_list:
+        processed_question = {}
+        processed_question['id'] = question[0]
+        processed_question['titleContent'] = question[1]
+        if question[2] is None:
+            processed_question['imageUrl'] = None
+        else:
+            processed_question['imageUrl'] = url_for(
+                'static', filename=question[2])
+        processed_question['userName'] = question[3]
+        processed_question['askTime'] = question[4]
+        processed_question_list.append(processed_question)
+    
+    return jsonify(code=200,
                        message="Get question successful",
-                       question_list=question_list)
+                       questions=processed_question_list)
 
 
-@app.route('/getOneQuestion', methods=['POST',])
+@app.route('/getQuestionById', methods=['POST',])
 def get_question_content():
     # frontend post the question id needed
     raw_data = request.get_data()
     print(raw_data)
     processed_data = utils.process_data(raw_data)
-    question_id = processed_data['qid']
+    question_id = processed_data['id']
     question_content = database.get_one_question(question_id)
     if question_content is None:
-        return jsonify(code=404, message="content not found!")
+        return jsonify(code=401, message="error:question should exists!")
+
+    comment_list = database.get_comment_list(question_id)
+    # question_content: image, username, content, time
+    # comment_list: image, username, content, time, id
+    # reply_list: from_user.image, from_user.username, to_user.username, content, time
+    # return_data:{avatarUrl, userName, asktime, content, 
+    #       comments:[{commenterUrl, userName, commentTime, content, 
+    #                  replies:[{fromUserAvatarUrl, fromUserNickName, 
+    #                            toUserNickName, replyTime, replyContent}]} ]}
+    return_data = {}
+    if question_content[0] is None:
+        return_data['avatarUrl'] = None
     else:
-        return jsonify(code=200,
-                       message="Get question successful",
-                       question_content=question_content)
+        return_data['avatarUrl'] = url_for(
+            'static', filename=question_content[0])
+    return_data['userName'] = question_content[1]
+    return_data['askTime'] = question_content[3]
+    return_data['content'] = question_content[2]
+    return_data['comments'] = []
+    if comment_list is None:
+        return jsonify(code=200, message="comment is empty!", question=return_data)
+    
+    for comment in comment_list:
+        processed_comment = {}
+        if comment[0] is None:
+            processed_comment['commenterUrl'] = None
+        else:
+            processed_comment['commenterUrl'] = url_for(
+                'static', filename=comment[0])
+        processed_comment['userName'] = comment[1]
+        processed_comment['commentTime'] = comment[3]
+        processed_comment['content'] = comment[2]
+        processed_comment['replies'] = []
+        reply_list = database.get_reply_list(comment[4])
+        if reply_list is None:
+            continue
+        for reply in reply_list:
+            processed_reply = {}
+            if reply[0] is None:
+                processed_reply['fromUserAvatarUrl'] = None
+            else:
+                processed_reply['fromUserAvatarUrl'] = url_for(
+                    'static', filename=reply[0])
+            processed_reply['fromUserNickName'] = reply[1]
+            processed_reply['toUserNickName'] = reply[2]
+            processed_reply['replyTime'] = reply[4]
+            processed_reply['replyContent'] = reply[3]
+            processed_comment['replies'].append(processed_reply)
+        return_data['comments'].append(processed_comment)
+
+    return jsonify(code=200,
+                    message="Get question successful",
+                    question=return_data)
 
 
-@app.route('/insertQuestion', methods=['POST',])
+@app.route('/addQuestion', methods=['POST',])
 def insert_question():
     raw_data = request.get_data()
     print(raw_data)
     processed_data = utils.process_data(raw_data)
     classroom_id = session.get('classroom_id')
     user_id = session.get('user_id')
-    database.insert_question(processed_data, user_id, classroom_id)
+    try:
+        database.insert_question(processed_data, user_id, classroom_id)
+    # if longer than 255 characters
+    except sqlite3.IntegrityError:
+        return jsonify(code=409, message="Insert question failed!")
+    
     return jsonify(code=200, message="Insert question successful")
+
+
+@app.route('/addComment', methods=['POST',])
+def insert_comment():
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    question_id = processed_data['questionId']
+    user_id = session.get('user_id')
+    try:
+        database.insert_comment(processed_data, user_id, question_id)
+    # if longer than 255 characters
+    except sqlite3.IntegrityError:
+        return jsonify(code=409, message="Insert comment failed!")
+    
+    return jsonify(code=200, message="Insert comment successful")
+
+
+@app.route('/sentReply', methods=['POST',])
+def insert_reply():
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    user_id = session.get('user_id')
+    comment_id = processed_data['commentId']
+    try:
+        database.insert_reply(processed_data, user_id, comment_id)
+    # if longer than 255 characters
+    except sqlite3.IntegrityError:
+        return jsonify(code=409, message="Insert reply failed!")
+    
+    return jsonify(code=200, message="Insert reply successful")
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5001')

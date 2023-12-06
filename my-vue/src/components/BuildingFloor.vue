@@ -89,24 +89,45 @@ export default {
     },
     goin1() {
       //math
-      instance.post("/classRoom", {
-        subject: "math",
-      });
-      this.$router.push("/classroom");
+      instance
+        .post("/classRoom", {
+          subject: "math",
+        })
+        .then((res) => {
+          if (res.data.code === 200) {
+            this.$router.push("/classroom");
+          } else {
+            this.$message.error(res.data.message);
+          }
+        });
     },
     goin2() {
       //phy
-      instance.post("/classRoom", {
-        subject: "phy",
-      });
-      this.$router.push("/classroom");
+      instance
+        .post("/classRoom", {
+          subject: "phy",
+        })
+        .then((res) => {
+          if (res.data.code === 200) {
+            this.$router.push("/classroom");
+          } else {
+            this.$message.error(res.data.message);
+          }
+        });
     },
     goin3() {
       //chem
-      instance.post("/classRoom", {
-        subject: "chem",
-      });
-      this.$router.push("/classRoom");
+      instance
+        .post("/classRoom", {
+          subject: "chem",
+        })
+        .then((res) => {
+          if (res.data.code === 200) {
+            this.$router.push("/classroom");
+          } else {
+            this.$message.error(res.data.message);
+          }
+        });
     },
     goon() {
       this.$router.push("/second");

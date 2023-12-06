@@ -43,7 +43,7 @@ def create_db():
                   design VARCHAR(255) DEFAULT NULL,
                   phone VARCHAR(30) DEFAULT NULL,
                   image VARCHAR(255) DEFAULT NULL,
-                  time INTEGER DEFAULT 0,
+                  study_time INTEGER DEFAULT 0,
                   classroom_id INTEGER DEFAULT NULL,
                   FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
 
@@ -56,10 +56,34 @@ def create_db():
                     title VARCHAR(255) NOT NULL,
                     tag VARCHAR(255) NOT NULL,
                     content VARCHAR(255) NOT NULL,
-                    time INTEGER NOT NULL,
+                    time VARCHAR(255) NOT NULL,
                     FOREIGN KEY (user_id) REFERENCES users(id),
                     FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
     
+    # create comment table (id, user_id, question_id, content, time)
+    c.execute('''DROP TABLE IF EXISTS comments''')
+    c.execute('''CREATE TABLE IF NOT EXISTS comments
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    question_id INTEGER NOT NULL,
+                    content VARCHAR(255) NOT NULL,
+                    time VARCHAR(255) NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    FOREIGN KEY (question_id) REFERENCES questions(id))''')
+
+    # create reply table (id, user_id, comment_id, content, time, reply_to_id)
+    # reply_to_id is the id of reply that this reply replies to
+    c.execute('''DROP TABLE IF EXISTS replies''')
+    c.execute('''CREATE TABLE IF NOT EXISTS replies
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    comment_id INTEGER NOT NULL,
+                    content VARCHAR(255) NOT NULL,
+                    time VARCHAR(255) NOT NULL,
+                    reply_to_id INTEGER NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    FOREIGN KEY (comment_id) REFERENCES comments(id),
+                    FOREIGN KEY (reply_to_id) REFERENCES replies(id))''')
 
     # add math, phy, chem classrooms
     c.execute("INSERT INTO classrooms (subject) VALUES ('math')")
@@ -245,7 +269,7 @@ def get_study_time(id):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
-    query = "SELECT time FROM users WHERE id = ?"
+    query = "SELECT study_time FROM users WHERE id = ?"
     cursor.execute(query, (id,))
 
     result = cursor.fetchone()
@@ -264,7 +288,7 @@ def increase_study_time(id, mins):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
-    query = "UPDATE users SET time = time + " + \
+    query = "UPDATE users SET study_time = study_time + " + \
         str(mins) + " WHERE id = " + str(id)
     cursor.execute(query)
 
@@ -288,18 +312,28 @@ def get_online_num(classroom_id):
     return result[0] if result else None
 
 
-def get_question_list(classroom_id):
+def get_question_list(classroom_id, page):
     """
     获取classroom_id对应的最新的10个问题
     """
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
-    query = "SELECT id, user_id, title, tag, time FROM questions WHERE classroom_id = ? ORDER BY time DESC LIMIT 10"
-    cursor.execute(query, (classroom_id,))
+    # page 0 means get the first 10 questions
+    # page 1 means get the second 10 questions
+    query = "SELECT questions.id, title, image, username, time \
+            FROM questions join users \
+            ON users.id = questions.user_id \
+            WHERE questions.classroom_id = ? \
+            ORDER BY time DESC LIMIT 10 OFFSET ?"
+
+    cursor.execute(query, (classroom_id, page * 10))
 
     result = cursor.fetchall()
     conn.close()
+
+    # debug
+    print("get_question_list result", result)
 
     return result if result else None
 
@@ -308,16 +342,131 @@ def insert_question(question, user_id, classroom_id):
     """
     将question插入
     """
+    #debug
+    print("insert question started!")
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
-    query = "INSERT INTO questions (user_id, classroom_id, title, tag, content, time) VALUES (?, ?, ?, ?, ?, ?)"
+    #debug
+    print("database connected!")
+
+    query = "INSERT INTO questions (user_id, classroom_id, title, tag, content, time) \
+             VALUES (?, ?, ?, ?, ?, ?)"
     cursor.execute(query, (user_id, classroom_id, question["title"],
-                           question["tag"], question["content"], question["time"]))
+                           None, 
+                           question["content"], question["askTime"]))
+
+    #debug
+    print("insert question cursor executed!")
 
     conn.commit()
     conn.close()
 
+    #debug
+    print("insert_question finished!")
+
+
+def get_one_question(question_id):
+    """
+    根据question_id获取问题内容
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "SELECT image, username, content, time \
+            FROM questions join users \
+            ON users.id = questions.user_id \
+            WHERE questions.id = ?"
+
+    cursor.execute(query, (question_id,))
+
+    result = cursor.fetchone()
+    conn.close()
+
+    # debug
+    print("get_one_question result", result)
+
+    return result if result else None
+
+
+def get_comment_list(question_id):
+    """
+    根据question_id获取评论列表
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "SELECT image, username, content, time, id \
+            FROM comments join users \
+            ON users.id = comments.user_id \
+            WHERE question_id = ?"
+
+    cursor.execute(query, (question_id,))
+
+    result = cursor.fetchall()
+    conn.close()
+
+    # debug
+    print("get_comment_list result", result)
+
+    return result if result else None
+
+def get_reply_list(comment_id):
+    """
+    根据comment_id获取回复列表
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    # from_user_id, from_username, to_user_id, to_username, content, time
+    # q:what if replies join users twice?
+    # a:use alias
+    query = "SELECT from_user.image, from_user.username, to_user.username, content, time \
+            FROM replies join users as from_user \
+            ON from_user.id = replies.user_id \
+            join users as to_user \
+            ON to_user.id = replies.reply_to_id \
+            WHERE comment_id = ?"
+
+    cursor.execute(query, (comment_id,))
+
+    result = cursor.fetchall()
+    conn.close()
+
+    # debug
+    print("get_reply_list result", result)
+
+    return result if result else None
+
+
+def insert_comment(comment, user_id, question_id):
+    """
+    将comment插入
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "INSERT INTO comments (user_id, question_id, content, time) \
+             VALUES (?, ?, ?, ?)"
+    cursor.execute(query, (user_id, question_id, comment["content"], comment["time"]))
+
+    conn.commit()
+    conn.close()
+
+
+def insert_reply(reply, user_id, comment_id):
+    """
+    将reply插入
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "INSERT INTO replies (user_id, comment_id, content, time, reply_to_id) \
+             VALUES (?, ?, ?, ?, ?)"
+    cursor.execute(query, (user_id, comment_id, reply["content"], reply["time"], reply["reply_to_id"]))
+
+    conn.commit()
+    conn.close()
 
 if __name__ == "__main__":
     create_db()

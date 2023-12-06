@@ -4,6 +4,7 @@
       <PlanTable ref="infoRef"></PlanTable>
       <PersonalDia ref="infoRef1"></PersonalDia>
       <InfoDia ref="infoRef2"></InfoDia>
+      <BlackBoard ref="infoRef3"></BlackBoard>
       <el-image
         :src="currentScene"
         alt="Current Scene"
@@ -16,7 +17,9 @@
       <el-button type="primary" class="shift-button" @click="showSceneDialog">
         切换场景
       </el-button>
-      <el-button type="info" class="board-button"> 黑板 </el-button>
+      <el-button type="info" class="board-button" @click="showBoard">
+        黑板
+      </el-button>
       <el-button type="primary" class="back-button" @click="outclass">
       </el-button>
 
@@ -75,6 +78,7 @@ import PlanTable from "./PlanTable.vue";
 import PersonalDia from "./UserInfo.vue";
 import InfoDia from "./MoreInfo.vue";
 import ClockCounter from "./ClockCounter.vue";
+import BlackBoard from "./BlackBoard.vue";
 import instance from "@/axios";
 
 export default {
@@ -83,6 +87,7 @@ export default {
     PersonalDia,
     InfoDia,
     ClockCounter,
+    BlackBoard,
   },
   data() {
     return {
@@ -142,11 +147,18 @@ export default {
       this.$refs.infoRef.open();
     },
     outclass() {
-      instance.post("/timeIncrease", {
-        min: this.$refs.clockref.min,
-        sec: this.$refs.clockref.sec,
-      });
-      this.$router.push("/classroom");
+      instance
+        .post("/timeIncrease", {
+          min: this.$refs.clockref.min,
+          sec: this.$refs.clockref.sec,
+        })
+        .then((res) => {
+          if (res.data.code === 200) {
+            this.$router.push("/classroom");
+          } else {
+            this.$message.error(res.data.message);
+          }
+        });
     },
     showPersonalDialog() {
       this.$refs.infoRef1.open();
@@ -165,6 +177,9 @@ export default {
     switchScene(index) {
       this.currentScene = this.choices[index - 1]; // Use index to get the corresponding choice
       this.dialogVis = false;
+    },
+    showBoard() {
+      this.$refs.infoRef3.open();
     },
   },
   beforeUnmount() {
@@ -245,7 +260,7 @@ export default {
   transform: translate(-50%, -50%);
   font-size: 50px;
   color: #ffffff;
-  font-family: STLiti, serif;
+  font-family: Helvetica;
 }
 
 .scene-grid {

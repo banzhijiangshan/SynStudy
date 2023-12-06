@@ -167,6 +167,7 @@ export default {
           });
         }
       });
+      this.dialogVisible = false;
     },
     handleClose() {
       this.dialogVisible = false;
