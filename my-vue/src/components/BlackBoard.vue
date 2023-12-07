@@ -474,11 +474,9 @@ export default {
       let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
       let fromUserNickName = "";
       let fromUserAvatarUrl = "";
-      instance.get("/getNameAndAvatar").then((res) => {
-        if (res.data.code === 200) {
-          fromUserNickName = res.data.name;
-          fromUserAvatarUrl = res.data.avatarUrl;
-        }
+      instance.get("/getUserInfo").then((res) => {
+        fromUserNickName = res.data.userInfo.username;
+        fromUserAvatarUrl = res.data.userInfo.image;
       });
       let reply = {
         commentId: com.id,
