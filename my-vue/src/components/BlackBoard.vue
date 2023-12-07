@@ -297,11 +297,11 @@ export default {
           canInputReply: 200,
         },
       ],
-      avatarUrl: "",
+      avatarUrl: "", //当前问题的提问者的头像
       canInputText: 200,
       textareaContent: "",
-      backUrl: "",
-      backUserName: "",
+      backUrl: "", //后端传回
+      backUserName: "", //后端传回
     };
   },
   setup() {
@@ -473,9 +473,11 @@ export default {
       let minutes = String(now.getMinutes()).padStart(2, "0");
       let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
       let fromUserNickName = "";
-      instance.get("/getStudentName").then((res) => {
+      let fromUserAvatarUrl = "";
+      instance.get("/getNameAndAvatar").then((res) => {
         if (res.data.code === 200) {
           fromUserNickName = res.data.name;
+          fromUserAvatarUrl = res.data.avatarUrl;
         }
       });
       let reply = {
@@ -484,6 +486,7 @@ export default {
         replyTime: formattedDateTime,
         toUserNickName: com.userName,
         fromUserNickName: fromUserNickName,
+        fromUserAvatarUrl: fromUserAvatarUrl,
       };
       this.currentComments[index].replyies.push(reply);
       instance.post("/sentReply", reply).then((res) => {

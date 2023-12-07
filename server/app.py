@@ -27,7 +27,7 @@ def index():
 @app.route('/register', methods=['POST',])
 def register():
     raw_data = request.get_data()
-    # print(raw_data)
+    print(raw_data)
     processed_data = utils.process_data(raw_data)
     # now hash the raw password
     processed_data['password'] = bcrypt.generate_password_hash(processed_data['password'])
@@ -41,7 +41,7 @@ def register():
 @app.route('/login', methods=['POST',])
 def login():
     raw_data = request.get_data()
-    # print(type(raw_data), raw_data)
+    print(type(raw_data), raw_data)
     processed_data = utils.process_data(raw_data)
     name = processed_data["name"]
     password = processed_data["password"]
@@ -80,17 +80,17 @@ def get_user_info():
     id = session.get('user_id')
     user_info = database.fetch_user_info(id)
     user_info['id'] = id + 10000
-    # print(type(user_info))
+    print(type(user_info))
     # remove password from dict user_info
     user_info.pop('password', None)
-    # print(user_info)
+    print(user_info)
     if user_info['image'] == None:
         image_url = None
     else:
         image_url = url_for('static', filename=user_info['image'])
     #user_info['image'] = 'http://localhost:5001/' + user_info['image']
     user_info['image'] = image_url
-    # print(user_info['image'])
+    print(user_info['image'])
     if user_info == None:
         return jsonify(code=401, message="id error")
     else:
@@ -99,7 +99,7 @@ def get_user_info():
 @app.route('/updateUserInfo', methods=['POST',])
 def update_user_info():
     raw_data = request.get_data()
-    # print(raw_data)
+    print(raw_data)
     processed_data = utils.process_data(raw_data)
     id = session.get('user_id')
     try:
@@ -111,18 +111,18 @@ def update_user_info():
 @app.route('/uploadAvatar', methods=['POST',])
 def upload_avatar():
     # Check if the request has the file part
-    # print(request.files)
+    print(request.files)
     if 'file' not in request.files:
         return jsonify(code=400, message="No file part")
 
     file = request.files['file']
-    # print(type(file))
-    # print(file)
+    print(type(file))
+    print(file)
 
 
     # If the user does not select a file, the browser submits an
     # empty file without a filename.
-    # print(file.filename)
+    print(file.filename)
     if file.filename == '':
         return jsonify(code=400, message="No selected file")
 
@@ -139,15 +139,13 @@ def upload_avatar():
 @app.route('/classRoom', methods=['POST',])
 def enter_classroom():
     raw_data = request.get_data()
-    # print(raw_data)
+    print(raw_data)
     processed_data = utils.process_data(raw_data)
     subject = processed_data['subject']
     id = session.get('user_id')
     classroom_id = database.get_classroom_id(subject)
     # set session classroom_id
     session['classroom_id'] = classroom_id
-    print("hhhh")
-    print(classroom_id)
     if classroom_id == None:
         return jsonify(code=401, message="Classroom not exists!")
     else:
@@ -180,13 +178,13 @@ def get_study_info():
     # get online_num using classroom_id
     classroom_id = session.get('classroom_id')
     online_num = database.get_online_num(classroom_id)
-    print(classroom_id, hours, mins, online_num)
+
     return jsonify(code = 200, message='Get success', studyInfo={'hour':hours, 'minute':mins, 'studytogether':online_num})
 
 @app.route('/timeIncrease', methods=['POST',])
 def time_increase():
     raw_data = request.get_data()
-    # print(raw_data)
+    print(raw_data)
     processed_data = utils.process_data(raw_data)
     id = session.get('user_id')
     mins = processed_data['min']

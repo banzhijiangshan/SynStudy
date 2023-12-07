@@ -35,7 +35,7 @@ def create_db():
                   password CHAR(60) NOT NULL,
                   email VARCHAR(50) NOT NULL UNIQUE,
                   sex INTEGER DEFAULT 0,
-                  age INTEGER DEFAULT NULL,
+                  age INTEGER DEFAULT 0,
                   area VARCHAR(30) DEFAULT NULL,
                   hobby VARCHAR(60) DEFAULT NULL,
                   work VARCHAR(30) DEFAULT NULL,
@@ -89,7 +89,7 @@ def fetch_pw_and_id(user_input):
         id = result[1] if result else None
 
     # check if user_input is username (4-16 characters started with letter)
-    elif re.match(r"[a-zA-Z][a-zA-Z0-9]{0,15}", user_input):
+    elif re.match(r"[a-zA-Z][a-zA-Z0-9]{3,15}", user_input):
         query = "SELECT password, id FROM users WHERE username = ?"
         cursor.execute(query, (user_input,))
         result = cursor.fetchone()
