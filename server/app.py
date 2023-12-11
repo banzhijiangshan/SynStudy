@@ -42,6 +42,7 @@ def register():
     return jsonify(code=200, message="Register successful")
 
 
+
 @app.route('/login', methods=['POST',])
 def login():
     raw_data = request.get_data()
@@ -59,10 +60,13 @@ def login():
         return jsonify(code=200, message="Login successful")
 
 
+
 @app.route('/logout', methods=['POST',])
 def logout():
     session.pop('user_id', None)
     return jsonify(code=200, message="Logout successful")
+
+
 
 
 @app.route('/generateStudentId', methods=['GET',])
@@ -70,6 +74,7 @@ def get_new_id():
     max_cur_id = database.fetch_cur_cnt()
     new_id = max_cur_id + 10001
     return jsonify(code=200, message="Get new id successful", studentId=new_id)
+
 
 
 @app.route('/getStudentName', methods=['GET',])
@@ -81,6 +86,7 @@ def get_name_by_id():
         return jsonify(code=401, message="id error")
     else:
         return jsonify(code=200, message="Get name successful", name=name)
+
 
 
 @app.route('/getUserInfo', methods=['GET',])
@@ -120,6 +126,7 @@ def update_user_info():
     return jsonify(code=200, message="Update user info successful")
 
 
+
 @app.route('/uploadAvatar', methods=['POST',])
 def upload_avatar():
     # Check if the request has the file part
@@ -148,6 +155,7 @@ def upload_avatar():
         return jsonify(code=200, message="Upload avatar successful")
 
 
+
 @app.route('/classRoom', methods=['POST',])
 def enter_classroom():
     raw_data = request.get_data()
@@ -168,6 +176,8 @@ def enter_classroom():
         return jsonify(code=200, message="Enter classroom successful")
 
 
+
+
 @app.route('/exitClassRoom', methods=['POST',])
 def leave_classroom():
     id = session.get('user_id')
@@ -184,6 +194,8 @@ def leave_classroom():
                            message="Classroom already empty, \
                             please check for error!")
         return jsonify(code=200, message="Leave classroom successful")
+
+
 
 
 @app.route('/getStudyInfo', methods=['GET',])
@@ -266,7 +278,7 @@ def get_question_content():
     # comment_list: image, username, content, time, id
     # reply_list: from_user.image, from_user.username, to_user.username, content, time
     # return_data:{avatarUrl, userName, asktime, content, 
-    #       comments:[{commenterUrl, userName, commentTime, content, 
+    #       comments:[{commenterUrl, userName, commentTime, content, commentId,
     #                  replies:[{fromUserAvatarUrl, fromUserNickName, 
     #                            toUserNickName, replyTime, replyContent}]} ]}
     return_data = {}
@@ -292,6 +304,7 @@ def get_question_content():
         processed_comment['userName'] = comment[1]
         processed_comment['commentTime'] = comment[3]
         processed_comment['content'] = comment[2]
+        processed_comment['commentId'] = comment[4]
         processed_comment['replies'] = []
         reply_list = database.get_reply_list(comment[4])
         if reply_list is None:
@@ -328,7 +341,6 @@ def insert_question():
     except sqlite3.IntegrityError:
         return jsonify(code=409, message="Insert question failed!")
     
-    print("hhhhhhhhhhhhh\n")
     return jsonify(code=200, message="Insert question successful")
 
 
@@ -340,12 +352,25 @@ def insert_comment():
     question_id = processed_data['questionId']
     user_id = session.get('user_id')
     try:
-        database.insert_comment(processed_data, user_id, question_id)
+        comment_id = database.insert_comment(processed_data, user_id, question_id)
     # if longer than 255 characters
     except sqlite3.IntegrityError:
         return jsonify(code=409, message="Insert comment failed!")
     
-    return jsonify(code=200, message="Insert comment successful")
+    # get imageUrl, username using database.fetch_user_info
+    user_info = database.fetch_user_info(user_id)
+    if user_info['image'] is None:
+        image_url = None
+    else:
+        image_url = url_for('static', filename=user_info['image'])
+    username = user_info['username']
+    comment_info = {
+        'commentId': comment_id,
+        'imageUrl': image_url,
+        'userName': username
+    }
+    
+    return jsonify(code=200, message="Insert comment successful", info=comment_info)
 
 
 @app.route('/sentReply', methods=['POST',])
