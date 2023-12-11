@@ -328,6 +328,7 @@ def insert_question():
     except sqlite3.IntegrityError:
         return jsonify(code=409, message="Insert question failed!")
     
+    print("hhhhhhhhhhhhh\n")
     return jsonify(code=200, message="Insert question successful")
 
 
