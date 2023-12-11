@@ -424,8 +424,9 @@ export default {
     getNewestQuestion() {
       instance.get("/getNewestQuestion").then((res) => {
         if (res.data.code === 200) {
-          this.allQuestions.push(res.data.question);
+          this.allQuestions.unshift(res.data.question);
           this.page += 1;
+          //this.loadFinished = true;
         }
       });
     },
@@ -459,7 +460,7 @@ export default {
             });
             this.questionForm.title = "";
             this.questionForm.content = "";
-            this.loadFinished = false;
+            //this.loadFinished = false;
             this.getNewestQuestion();
           }
         });
@@ -745,10 +746,10 @@ export default {
 .list {
   position: absolute;
   margin-top: 4%;
-  margin-left: 10%;
+  margin-left: 12%;
   list-style-type: none;
   width: 76%;
-  height: 64%;
+  height: 62%;
 }
 
 .list-item {
