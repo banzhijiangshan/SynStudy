@@ -98,10 +98,12 @@ def get_user_info():
     # remove password from dict user_info
     user_info.pop('password', None)
     # print(user_info)
-    if user_info['image'] is None:
-        image_url = None
-    else:
-        image_url = url_for('static', filename=user_info['image'])
+    image_url = url_for('static', \
+                        filename=user_info['image'] if user_info['image'] else "user_pics/default.jpg")
+    # if user_info['image'] is None:
+    #     image_url = None
+    # else:
+    #     image_url = url_for('static', filename=user_info['image'])
     # user_info['image'] = 'http://localhost:5001/' + user_info['image']
     user_info['image'] = image_url
     # print(user_info['image'])
@@ -248,11 +250,13 @@ def get_question_list():
         processed_question = {}
         processed_question['id'] = question[0]
         processed_question['titleContent'] = question[1]
-        if question[2] is None:
-            processed_question['imageUrl'] = None
-        else:
-            processed_question['imageUrl'] = url_for(
-                'static', filename=question[2])
+        processed_question['imageUrl'] = url_for(
+                'static', filename=question[2] if question[2] else "user_pics/default.jpg")
+        # if question[2] is None:
+        #     processed_question['imageUrl'] = None
+        # else:
+        #     processed_question['imageUrl'] = url_for(
+        #         'static', filename=question[2])
         processed_question['userName'] = question[3]
         processed_question['askTime'] = question[4]
         processed_question_list.append(processed_question)
@@ -286,11 +290,13 @@ def get_question_content():
     #                  replies:[{fromUserAvatarUrl, fromUserNickName, 
     #                            toUserNickName, replyTime, replyContent}]} ]}
     return_data = {}
-    if question_content[0] is None:
-        return_data['avatarUrl'] = None
-    else:
-        return_data['avatarUrl'] = url_for(
-            'static', filename=question_content[0])
+    return_data['avatarUrl'] = url_for(
+            'static', filename=question_content[0] if question_content[0] else "user_pics/default.jpg")
+    # if question_content[0] is None:
+    #     return_data['avatarUrl'] = None
+    # else:
+    #     return_data['avatarUrl'] = url_for(
+    #         'static', filename=question_content[0])
     return_data['userName'] = question_content[1]
     return_data['askTime'] = question_content[3]
     return_data['content'] = question_content[2]
@@ -300,11 +306,13 @@ def get_question_content():
 
     for comment in comment_list:
         processed_comment = {}
-        if comment[0] is None:
-            processed_comment['commenterUrl'] = None
-        else:
-            processed_comment['commenterUrl'] = url_for(
-                'static', filename=comment[0])
+        processed_comment['commenterUrl'] = url_for(
+                'static', filename=comment[0] if comment[0] else "user_pics/default.jpg")
+        # if comment[0] is None:
+        #     processed_comment['commenterUrl'] = None
+        # else:
+        #     processed_comment['commenterUrl'] = url_for(
+        #         'static', filename=comment[0])
         processed_comment['userName'] = comment[1]
         processed_comment['commentTime'] = comment[3]
         processed_comment['content'] = comment[2]
@@ -314,11 +322,13 @@ def get_question_content():
         if reply_list is not None:
             for reply in reply_list:
                 processed_reply = {}
-                if reply[0] is None:
-                    processed_reply['fromUserAvatarUrl'] = None
-                else:
-                    processed_reply['fromUserAvatarUrl'] = url_for(
-                        'static', filename=reply[0])
+                processed_reply['fromUserAvatarUrl'] = url_for(
+                        'static', filename=reply[0] if reply[0] else "user_pics/default.jpg")
+                # if reply[0] is None:
+                #     processed_reply['fromUserAvatarUrl'] = None
+                # else:
+                #     processed_reply['fromUserAvatarUrl'] = url_for(
+                #         'static', filename=reply[0])
                 processed_reply['fromUserNickName'] = reply[1]
                 processed_reply['toUserNickName'] = reply[2]
                 processed_reply['replyTime'] = reply[4]
@@ -362,10 +372,12 @@ def insert_comment():
     
     # get imageUrl, username using database.fetch_user_info
     user_info = database.fetch_user_info(user_id)
-    if user_info['image'] is None:
-        image_url = None
-    else:
-        image_url = url_for('static', filename=user_info['image'])
+    image_url = url_for('static', \
+                        filename=user_info['image'] if user_info['image'] else "user_pics/default.jpg")
+    # if user_info['image'] is None:
+    #     image_url = None
+    # else:
+    #     image_url = url_for('static', filename=user_info['image'])
     username = user_info['username']
     comment_info = {
         'commentId': comment_id,
@@ -410,18 +422,15 @@ def get_newest_question():
         processed_question = {}
         processed_question['id'] = question[0]
         processed_question['titleContent'] = question[1]
-        if question[2] is None:
-            processed_question['imageUrl'] = None
-        else:
-            processed_question['imageUrl'] = url_for(
-                'static', filename=question[2])
+        processed_question['imageUrl'] = url_for(
+            'static', filename=question[2] if question[2] else "user_pics/default.jpg")
         processed_question['userName'] = question[3]
         processed_question['askTime'] = question[4]
         processed_question_list.append(processed_question)
 
     return jsonify(code=200,
                        message="Get question successful",
-                       questions=processed_question_list[0])
+                       question=processed_question_list[0])
 
 
 
