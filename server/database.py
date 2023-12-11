@@ -49,7 +49,6 @@ def create_db():
                   study_time INTEGER DEFAULT 0,
                   classroom_id INTEGER DEFAULT NULL,
                   FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
-                  FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
 
     c.execute('''DROP TABLE IF EXISTS questions''')
     # id, user_id, classroom_id, title, tag, content, time
@@ -208,7 +207,6 @@ def update_user_info(id, data):
     query = "UPDATE users SET "
     # do when data[key] is not None
     for key in data:
-        if data[key] is not None and key != 'id':
         if data[key] is not None and key != 'id':
             query += key + " = '" + str(data[key]) + "', "
 
@@ -457,17 +455,23 @@ def get_reply_list(comment_id):
 
 def insert_comment(comment, user_id, question_id):
     """
-    将comment插入
+    将comment插入，返回comment_id
     """
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
     query = "INSERT INTO comments (user_id, question_id, content, time) \
              VALUES (?, ?, ?, ?)"
-    cursor.execute(query, (user_id, question_id, comment["content"], comment["time"]))
+    cursor.execute(query, (user_id, question_id, comment["content"], 
+                           comment["time"] if "time" in comment else "Unknown"))
+    
+    comment_id = cursor.lastrowid
 
     conn.commit()
     conn.close()
+
+    return comment_id
+
 
 
 def insert_reply(reply, user_id, comment_id):

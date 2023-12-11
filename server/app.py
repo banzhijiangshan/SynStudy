@@ -52,7 +52,6 @@ def login():
     password = processed_data["password"]
     correct_pwd, id = database.fetch_pw_and_id(name)
     if correct_pwd is None:
-    if correct_pwd is None:
         return jsonify(code=401, message="User not exists!")
     elif not bcrypt.check_password_hash(correct_pwd, password):
         return jsonify(code=401, message="Incorrect password!")
@@ -84,7 +83,6 @@ def get_name_by_id():
     user_info = database.fetch_user_info(id)
     name = user_info['username']
     if name is None:
-    if name is None:
         return jsonify(code=401, message="id error")
     else:
         return jsonify(code=200, message="Get name successful", name=name)
@@ -101,7 +99,6 @@ def get_user_info():
     user_info.pop('password', None)
     # print(user_info)
     if user_info['image'] is None:
-    if user_info['image'] is None:
         image_url = None
     else:
         image_url = url_for('static', filename=user_info['image'])
@@ -109,7 +106,6 @@ def get_user_info():
     # user_info['image'] = 'http://localhost:5001/' + user_info['image']
     user_info['image'] = image_url
     # print(user_info['image'])
-    if user_info is None:
     if user_info is None:
         return jsonify(code=401, message="id error")
     else:
@@ -177,7 +173,6 @@ def enter_classroom():
     # set session classroom_id
     session['classroom_id'] = classroom_id
     if classroom_id is None:
-    if classroom_id is None:
         return jsonify(code=401, message="Classroom not exists!")
     else:
         try:
@@ -195,7 +190,6 @@ def leave_classroom():
     classroom_id = session.get('classroom_id')
     # pop session classroom_id
     session.pop('classroom_id', None)
-    if classroom_id is None:
     if classroom_id is None:
         return jsonify(code=401, message="Classroom not set!")
     else:
@@ -302,7 +296,7 @@ def get_question_content():
     # comment_list: image, username, content, time, id
     # reply_list: from_user.image, from_user.username, to_user.username, content, time
     # return_data:{avatarUrl, userName, asktime, content, 
-    #       comments:[{commenterUrl, userName, commentTime, content, 
+    #       comments:[{commenterUrl, userName, commentTime, content, commentId,
     #                  replies:[{fromUserAvatarUrl, fromUserNickName, 
     #                            toUserNickName, replyTime, replyContent}]} ]}
     return_data = {}
@@ -328,6 +322,7 @@ def get_question_content():
         processed_comment['userName'] = comment[1]
         processed_comment['commentTime'] = comment[3]
         processed_comment['content'] = comment[2]
+        processed_comment['commentId'] = comment[4]
         processed_comment['replies'] = []
         reply_list = database.get_reply_list(comment[4])
         if reply_list is None:
@@ -375,12 +370,25 @@ def insert_comment():
     question_id = processed_data['questionId']
     user_id = session.get('user_id')
     try:
-        database.insert_comment(processed_data, user_id, question_id)
+        comment_id = database.insert_comment(processed_data, user_id, question_id)
     # if longer than 255 characters
     except sqlite3.IntegrityError:
         return jsonify(code=409, message="Insert comment failed!")
     
-    return jsonify(code=200, message="Insert comment successful")
+    # get imageUrl, username using database.fetch_user_info
+    user_info = database.fetch_user_info(user_id)
+    if user_info['image'] is None:
+        image_url = None
+    else:
+        image_url = url_for('static', filename=user_info['image'])
+    username = user_info['username']
+    comment_info = {
+        'commentId': comment_id,
+        'imageUrl': image_url,
+        'userName': username
+    }
+    
+    return jsonify(code=200, message="Insert comment successful", info=comment_info)
 
 
 @app.route('/sentReply', methods=['POST',])
