@@ -236,7 +236,7 @@ def get_question_list():
     processed_data = utils.process_data(raw_data)
     page = processed_data['page']
     classroom_id = session.get('classroom_id')
-    question_list = database.get_question_list(classroom_id, page)
+    question_list = database.get_question_list(classroom_id, page, num=5)
 
     if question_list is None:
         return jsonify(code=200, message="list is empty!", questions={})
@@ -257,6 +257,10 @@ def get_question_list():
         processed_question['askTime'] = question[4]
         processed_question_list.append(processed_question)
     
+    # debug
+    print("app.get_question_list gets: ", raw_data)
+    print("app.get_question_list returns: ", processed_question_list)
+
     return jsonify(code=200,
                        message="Get question successful",
                        questions=processed_question_list)
@@ -293,7 +297,7 @@ def get_question_content():
     return_data['comments'] = []
     if comment_list is None:
         return jsonify(code=200, message="comment is empty!", question=return_data)
-    
+
     for comment in comment_list:
         processed_comment = {}
         if comment[0] is None:
@@ -307,20 +311,19 @@ def get_question_content():
         processed_comment['commentId'] = comment[4]
         processed_comment['replies'] = []
         reply_list = database.get_reply_list(comment[4])
-        if reply_list is None:
-            continue
-        for reply in reply_list:
-            processed_reply = {}
-            if reply[0] is None:
-                processed_reply['fromUserAvatarUrl'] = None
-            else:
-                processed_reply['fromUserAvatarUrl'] = url_for(
-                    'static', filename=reply[0])
-            processed_reply['fromUserNickName'] = reply[1]
-            processed_reply['toUserNickName'] = reply[2]
-            processed_reply['replyTime'] = reply[4]
-            processed_reply['replyContent'] = reply[3]
-            processed_comment['replies'].append(processed_reply)
+        if reply_list is not None:
+            for reply in reply_list:
+                processed_reply = {}
+                if reply[0] is None:
+                    processed_reply['fromUserAvatarUrl'] = None
+                else:
+                    processed_reply['fromUserAvatarUrl'] = url_for(
+                        'static', filename=reply[0])
+                processed_reply['fromUserNickName'] = reply[1]
+                processed_reply['toUserNickName'] = reply[2]
+                processed_reply['replyTime'] = reply[4]
+                processed_reply['replyContent'] = reply[3]
+                processed_comment['replies'].append(processed_reply)
         return_data['comments'].append(processed_comment)
 
     return jsonify(code=200,
@@ -369,6 +372,9 @@ def insert_comment():
         'imageUrl': image_url,
         'userName': username
     }
+
+    #debug
+    print("app.insert_comment returns: ", comment_info)
     
     return jsonify(code=200, message="Insert comment successful", info=comment_info)
 
@@ -387,6 +393,36 @@ def insert_reply():
         return jsonify(code=409, message="Insert reply failed!")
     
     return jsonify(code=200, message="Insert reply successful")
+
+
+@app.route('/getNewestQuestion', methods=['GET',])
+def get_newest_question():
+    classroom_id = session.get('classroom_id')
+    question_list = database.get_question_list(classroom_id, 0, num=1)
+
+    if question_list is None:
+        return jsonify(code=400, message="no question, error!", questions={})
+
+    # question_list: questions.id, title, image, username, time
+    # processed_question_list: id, titleContent, imageUrl, userName, askTime
+    processed_question_list = []
+    for question in question_list:
+        processed_question = {}
+        processed_question['id'] = question[0]
+        processed_question['titleContent'] = question[1]
+        if question[2] is None:
+            processed_question['imageUrl'] = None
+        else:
+            processed_question['imageUrl'] = url_for(
+                'static', filename=question[2])
+        processed_question['userName'] = question[3]
+        processed_question['askTime'] = question[4]
+        processed_question_list.append(processed_question)
+
+    return jsonify(code=200,
+                       message="Get question successful",
+                       questions=processed_question_list[0])
+
 
 
 if __name__ == '__main__':
