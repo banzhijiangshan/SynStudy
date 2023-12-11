@@ -421,6 +421,14 @@ export default {
         });
       }
     },
+    getNewestQuestion() {
+      instance.get("/getNewestQuestion").then((res) => {
+        if (res.data.code === 200) {
+          this.allQuestions.push(res.data.question);
+          this.page += 1;
+        }
+      });
+    },
     submitQuestion() {
       if (this.questionForm.title === "" || this.questionForm.content === "") {
         ElMessage({
@@ -452,7 +460,7 @@ export default {
             this.questionForm.title = "";
             this.questionForm.content = "";
             this.loadFinished = false;
-            this.load();
+            this.getNewestQuestion();
           }
         });
     },
