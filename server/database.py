@@ -80,10 +80,9 @@ def create_db():
                     comment_id INTEGER NOT NULL,
                     content VARCHAR(255) NOT NULL,
                     time VARCHAR(255) NOT NULL,
-                    reply_to_id INTEGER NOT NULL,
+                    reply_to_username VARCHAR(255) NOT NULL,
                     FOREIGN KEY (user_id) REFERENCES users(id),
-                    FOREIGN KEY (comment_id) REFERENCES comments(id),
-                    FOREIGN KEY (reply_to_id) REFERENCES replies(id))''')
+                    FOREIGN KEY (comment_id) REFERENCES comments(id))''')
 
     # add math, phy, chem classrooms
     c.execute("INSERT INTO classrooms (subject) VALUES ('math')")
@@ -342,13 +341,9 @@ def insert_question(question, user_id, classroom_id):
     """
     将question插入
     """
-    #debug
-    print("insert question started!")
+
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
-
-    #debug
-    print("database connected!")
 
     query = "INSERT INTO questions (user_id, classroom_id, title, tag, content, time) \
              VALUES (?, ?, ?, ?, ?, ?)"
@@ -356,14 +351,9 @@ def insert_question(question, user_id, classroom_id):
                            question["tag"] if "tag" in question else "Default", 
                            question["content"], question["askTime"]))
 
-    #debug
-    print("insert question cursor executed!")
-
     conn.commit()
     conn.close()
 
-    #debug
-    print("insert_question finished!")
 
 
 def get_one_question(question_id):
@@ -396,7 +386,7 @@ def get_comment_list(question_id):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
-    query = "SELECT image, username, content, time, id \
+    query = "SELECT image, username, content, time, comments.id \
             FROM comments join users \
             ON users.id = comments.user_id \
             WHERE question_id = ?"
@@ -421,11 +411,9 @@ def get_reply_list(comment_id):
     # from_user_id, from_username, to_user_id, to_username, content, time
     # q:what if replies join users twice?
     # a:use alias
-    query = "SELECT from_user.image, from_user.username, to_user.username, content, time \
+    query = "SELECT from_user.image, from_user.username, reply_to_username, content, time \
             FROM replies join users as from_user \
             ON from_user.id = replies.user_id \
-            join users as to_user \
-            ON to_user.id = replies.reply_to_id \
             WHERE comment_id = ?"
 
     cursor.execute(query, (comment_id,))
@@ -461,9 +449,9 @@ def insert_reply(reply, user_id, comment_id):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
-    query = "INSERT INTO replies (user_id, comment_id, content, time, reply_to_id) \
+    query = "INSERT INTO replies (user_id, comment_id, content, time, reply_to_username) \
              VALUES (?, ?, ?, ?, ?)"
-    cursor.execute(query, (user_id, comment_id, reply["content"], reply["time"], reply["reply_to_id"]))
+    cursor.execute(query, (user_id, comment_id, reply["content"], reply["replyTime"], reply["toUserNickName"]))
 
     conn.commit()
     conn.close()
