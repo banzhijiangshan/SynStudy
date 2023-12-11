@@ -30,19 +30,24 @@
         virtual-triggering
         placement="top"
         align="center"
-        :class="{ 'centered-title': isPopoverVisible }"
       >
         <el-form :model="questionForm" label-width="80px">
           <el-form-item label="简述:">
             <el-input
               v-model="questionForm.title"
               class="titleInput"
+              maxlength="20"
+              show-word-limit
             ></el-input>
           </el-form-item>
           <el-form-item label="内容:">
             <el-input
               v-model="questionForm.content"
               class="contentInput"
+              type="textarea"
+              :rows="8"
+              maxlength="200"
+              show-word-limit
             ></el-input>
           </el-form-item>
           <el-form-item>
@@ -55,6 +60,7 @@
           </el-form-item>
         </el-form>
       </el-popover>
+
       <ul
         class="list"
         v-infinite-scroll="load"
@@ -74,11 +80,13 @@
               <div style="width: 200px"></div>
               <span
                 style="
+                  position: absolute;
                   float: left;
-                  font-size: 15px;
+                  font-size: 14px;
                   align-items: center;
                   display: flex;
-                  color: #a426ce;
+                  color: #000000;
+                  left: 40%;
                 "
               >
                 {{ item.askTime }}
@@ -125,11 +133,13 @@
             <div style="width: 200px"></div>
             <span
               style="
+                position: absolute;
                 float: left;
-                font-size: 15px;
+                font-size: 16px;
                 align-items: center;
                 display: flex;
                 color: #a426ce;
+                left: 40%;
               "
             >
               {{ currentAskTime }}
@@ -206,12 +216,19 @@
               <div class="inputReply" v-if="com.openReply">
                 <textarea
                   v-model="com.replyContent"
-                  placeholder="说点什么吧~"
+                  :placeholder="'回复@' + com.userName + ': '"
                   maxlength="200"
                   @input="calcInputReply(index)"
                 >
                 </textarea>
-                <span style="font-size: 14px; float: left"
+                <span
+                  style="
+                    position: absolute;
+                    font-size: 14px;
+                    float: left;
+                    left: 3%;
+                    bottom: 5%;
+                  "
                   >还可以输入{{ com.canInputReply }}个字符</span
                 >
                 <span class="sent" @click="sentReply(com, index)">回复</span>
@@ -220,7 +237,7 @@
               <ul class="reply-ul">
                 <li
                   class="reply-li"
-                  v-for="(reply, index1) in com.replyies"
+                  v-for="(reply, index1) in com.replies"
                   :key="index1"
                 >
                   <div class="reply-li-top">
@@ -251,12 +268,7 @@
         </div>
       </template>
 
-      <template #footer>
-        <div style="flex: auto">
-          <el-button @click="cancelClick">cancel</el-button>
-          <el-button type="primary" @click="confirmClick">confirm</el-button>
-        </div>
-      </template>
+      <template #footer> </template>
     </el-drawer>
   </div>
 </template>
@@ -280,28 +292,37 @@ export default {
         content: "",
       },
       loading: false,
-      currentAsker: "",
-      currentAskTime: "",
+      currentAsker: "Alice",
+      currentAskTime: "2021-06-01 11:00",
       currentContent:
         "有ABC三个神,只知他们名为“真实、虚谎、任性”,但不知哪个代号属于哪个名字。真实之神只说真话，虚谎之神只说假话,而任性之神会随机地说真话或假话。我们的任务是找出ABC的身份。我们一共可以问他们三个问题，且问题必须是用“是”或“否回答的问题，每次只能向其中一个神发问但可以问同一个神多个问题。神只会用他们的语言回答“da”或“ja”,其中一个代表“是”，一个代表“否”,但我们不知道哪个回答是哪个意思。如何提问才能区分出三个神的身份?",
       currentComments: [
         {
           id: 1,
           commenterUrl: "",
-          userName: "",
+          userName: "Bob",
           commentTime: "2021-06-01 12:00",
           content: "这个问题很有意思",
           openReply: false,
-          replies: [],
+          replies: [
+            {
+              commentId: 1,
+              content: "我也觉得",
+              replyTime: "2021-06-01 12:05",
+              toUserNickName: "Bob",
+              fromUserNickName: "Carol",
+              fromUserAvatarUrl: "",
+            },
+          ],
           replyContent: "",
           canInputReply: 200,
         },
       ],
-      avatarUrl: "",
+      avatarUrl: "", //当前问题的提问者的头像
       canInputText: 200,
       textareaContent: "",
-      backUrl: "",
-      backUserName: "",
+      backUrl: "", //后端传回
+      backUserName: "", //后端传回
     };
   },
   setup() {
@@ -345,7 +366,6 @@ export default {
               for (let i = 0; i < res.data.questions.length; i++) {
                 this.allQuestions.push(res.data.questions[i]);
               }
-              this.lastpage = this.page;
               this.page += res.data.questions.length;
               if (res.data.questions.length < 5) {
                 this.loadFinished = true;
@@ -364,6 +384,13 @@ export default {
       }
     },
     submitQuestion() {
+      if (this.questionForm.title === "" || this.questionForm.content === "") {
+        ElMessage({
+          message: "标题或内容不能为空",
+          type: "error",
+        });
+        return;
+      }
       let now = new Date();
       let year = now.getFullYear();
       let month = String(now.getMonth() + 1).padStart(2, "0");
@@ -383,7 +410,6 @@ export default {
               message: "提交成功",
               type: "success",
             });
-            this.$refs.popoverRef.doClose();
             this.questionForm.title = "";
             this.questionForm.content = "";
             this.loadFinished = false;
@@ -410,11 +436,18 @@ export default {
       this.canInputText = 200 - len;
     },
     calcInputReply(index) {
-      let len = this.comments[index].replyContent.length;
-      this.$set(this.comments[index], "canInputReply", 200 - len);
+      let len = this.currentComments[index].replyContent.length;
+      this.currentComments[index].canInputReply = 200 - len;
     },
     sentComment() {
       let tempComment = this.textareaContent;
+      if (tempComment === "") {
+        this.$message({
+          message: "评论内容不能为空",
+          type: "error",
+        });
+        return;
+      }
       //请求
       instance
         .post("/addComment", {
@@ -458,13 +491,22 @@ export default {
       this.currentComments.push(addComment);
     },
     openReply(com) {
-      this.$set(com, "openReply", true);
-      this.$set(com, "回复@" + com.nickName);
+      com.openReply = true;
+      //com.replyContent = "回复@" + com.userName + ": ";
+      //this.$set(com, "openReply", true);
+      //this.$set(com, "回复@" + com.nickName);
     },
     closeReply(index) {
-      this.$set(this.comments[index], "openReply", false);
+      this.currentComments[index].openReply = false;
     },
     sentReply(com, index) {
+      if (com.replyContent === "") {
+        this.$message({
+          message: "回复内容不能为空",
+          type: "error",
+        });
+        return;
+      }
       let now = new Date();
       let year = now.getFullYear();
       let month = String(now.getMonth() + 1).padStart(2, "0");
@@ -473,10 +515,10 @@ export default {
       let minutes = String(now.getMinutes()).padStart(2, "0");
       let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
       let fromUserNickName = "";
-      instance.get("/getStudentName").then((res) => {
-        if (res.data.code === 200) {
-          fromUserNickName = res.data.name;
-        }
+      let fromUserAvatarUrl = "";
+      instance.get("/getUserInfo").then((res) => {
+        fromUserNickName = res.data.userInfo.username;
+        fromUserAvatarUrl = res.data.userInfo.image;
       });
       let reply = {
         commentId: com.id,
@@ -484,6 +526,7 @@ export default {
         replyTime: formattedDateTime,
         toUserNickName: com.userName,
         fromUserNickName: fromUserNickName,
+        fromUserAvatarUrl: fromUserAvatarUrl,
       };
       this.currentComments[index].replyies.push(reply);
       instance.post("/sentReply", reply).then((res) => {
@@ -531,12 +574,13 @@ export default {
 }
 .contentInput {
   width: 300px;
-  height: 150px;
+  height: 200px;
+  line-height: 200px !important;
 }
 
 .submit-button {
   position: absolute;
-  margin-top: 15px;
+  margin-top: 1px;
   left: 67%;
   width: 70px;
   height: 35px;
@@ -610,7 +654,7 @@ export default {
 
 .list-item {
   margin: 3px;
-  color: var(--text-color);
+  color: #000000;
   border-radius: 10px;
   padding: 5px;
   float: left;
@@ -657,7 +701,7 @@ export default {
   border-radius: 13px;
   padding: 3%;
   background-color: #f7f2f2;
-  color: var(--text-color);
+  color: #000000;
 }
 
 .inputComment textarea {
@@ -668,7 +712,7 @@ export default {
   outline: none;
   resize: none;
   background-color: var(--main-bg-color);
-  color: var(--text-color);
+  color: #000000;
 }
 
 .inputComment .sent {
@@ -747,14 +791,14 @@ export default {
 .inputReply {
   float: left;
   margin-top: 1%;
-  width: 76%;
+  width: 92%;
   margin-left: 8%;
   position: relative;
-  height: 150px;
+  height: 140px;
   border-radius: 13px;
   padding: 2%;
-  background-color: var(--main-bg-color);
-  color: var(--text-color);
+  background-color: #eafffb;
+  color: #000000;
 }
 
 .inputReply textarea {
@@ -764,11 +808,14 @@ export default {
   border: 0 solid;
   outline: none;
   resize: none;
-  background-color: var(--main-bg-color);
-  color: var(--text-color);
+  background-color: #eafffb;
+  color: #000000;
 }
 
 .inputReply .sent {
+  position: absolute;
+  bottom: 4%;
+  right: 2%;
   border-radius: 30px;
   background-color: #ee464b;
   color: white;

@@ -42,6 +42,7 @@ def register():
     return jsonify(code=200, message="Register successful")
 
 
+
 @app.route('/login', methods=['POST',])
 def login():
     raw_data = request.get_data()
@@ -51,6 +52,7 @@ def login():
     password = processed_data["password"]
     correct_pwd, id = database.fetch_pw_and_id(name)
     if correct_pwd is None:
+    if correct_pwd is None:
         return jsonify(code=401, message="User not exists!")
     elif not bcrypt.check_password_hash(correct_pwd, password):
         return jsonify(code=401, message="Incorrect password!")
@@ -59,10 +61,13 @@ def login():
         return jsonify(code=200, message="Login successful")
 
 
+
 @app.route('/logout', methods=['POST',])
 def logout():
     session.pop('user_id', None)
     return jsonify(code=200, message="Logout successful")
+
+
 
 
 @app.route('/generateStudentId', methods=['GET',])
@@ -72,15 +77,18 @@ def get_new_id():
     return jsonify(code=200, message="Get new id successful", studentId=new_id)
 
 
+
 @app.route('/getStudentName', methods=['GET',])
 def get_name_by_id():
     id = session.get('user_id')
     user_info = database.fetch_user_info(id)
     name = user_info['username']
     if name is None:
+    if name is None:
         return jsonify(code=401, message="id error")
     else:
         return jsonify(code=200, message="Get name successful", name=name)
+
 
 
 @app.route('/getUserInfo', methods=['GET',])
@@ -93,15 +101,23 @@ def get_user_info():
     user_info.pop('password', None)
     # print(user_info)
     if user_info['image'] is None:
+    if user_info['image'] is None:
         image_url = None
     else:
         image_url = url_for('static', filename=user_info['image'])
     # user_info['image'] = 'http://localhost:5001/' + user_info['image']
+    # user_info['image'] = 'http://localhost:5001/' + user_info['image']
     user_info['image'] = image_url
     # print(user_info['image'])
     if user_info is None:
+    if user_info is None:
         return jsonify(code=401, message="id error")
     else:
+        return jsonify(code=200,
+                       message="Get user info successful",
+                       userInfo=user_info)
+
+
         return jsonify(code=200,
                        message="Get user info successful",
                        userInfo=user_info)
@@ -118,6 +134,7 @@ def update_user_info():
     except sqlite3.IntegrityError:
         return jsonify(code=409, message="Username or email already exists!")
     return jsonify(code=200, message="Update user info successful")
+
 
 
 @app.route('/uploadAvatar', methods=['POST',])
@@ -148,6 +165,7 @@ def upload_avatar():
         return jsonify(code=200, message="Upload avatar successful")
 
 
+
 @app.route('/classRoom', methods=['POST',])
 def enter_classroom():
     raw_data = request.get_data()
@@ -159,6 +177,7 @@ def enter_classroom():
     # set session classroom_id
     session['classroom_id'] = classroom_id
     if classroom_id is None:
+    if classroom_id is None:
         return jsonify(code=401, message="Classroom not exists!")
     else:
         try:
@@ -168,12 +187,15 @@ def enter_classroom():
         return jsonify(code=200, message="Enter classroom successful")
 
 
+
+
 @app.route('/exitClassRoom', methods=['POST',])
 def leave_classroom():
     id = session.get('user_id')
     classroom_id = session.get('classroom_id')
     # pop session classroom_id
     session.pop('classroom_id', None)
+    if classroom_id is None:
     if classroom_id is None:
         return jsonify(code=401, message="Classroom not set!")
     else:
@@ -183,7 +205,12 @@ def leave_classroom():
             return jsonify(code=409,
                            message="Classroom already empty, \
                             please check for error!")
+            return jsonify(code=409,
+                           message="Classroom already empty, \
+                            please check for error!")
         return jsonify(code=200, message="Leave classroom successful")
+
+
 
 
 @app.route('/getStudyInfo', methods=['GET',])
@@ -194,6 +221,15 @@ def get_study_info():
     # get online_num using classroom_id
     classroom_id = session.get('classroom_id')
     online_num = database.get_online_num(classroom_id)
+
+    return jsonify(code=200,
+                   message='Get success',
+                   studyInfo={
+                       'hour': hours,
+                       'minute': mins,
+                       'studytogether': online_num
+                   })
+
 
     return jsonify(code=200,
                    message='Get success',

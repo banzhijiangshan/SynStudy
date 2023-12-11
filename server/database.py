@@ -19,6 +19,8 @@ def create_db():
 
     # create a database for virtual classrooms,
     # (id, subject, online people numbers, online people id)
+    # create a database for virtual classrooms,
+    # (id, subject, online people numbers, online people id)
     c.execute('''DROP TABLE IF EXISTS classrooms''')
     c.execute('''CREATE TABLE IF NOT EXISTS classrooms
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +46,9 @@ def create_db():
                   phone VARCHAR(30) DEFAULT NULL,
                   image VARCHAR(255) DEFAULT NULL,
                   study_time INTEGER DEFAULT 0,
+                  study_time INTEGER DEFAULT 0,
                   classroom_id INTEGER DEFAULT NULL,
+                  FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
                   FOREIGN KEY (classroom_id) REFERENCES classrooms(id))''')
 
     c.execute('''DROP TABLE IF EXISTS questions''')
@@ -111,6 +115,7 @@ def insert_register_data(data):
     conn.close()
 
 
+
 def fetch_pw_and_id(user_input):
     """
     根据学号/用户名/邮箱查找对应的加密后密码和用户id
@@ -123,11 +128,13 @@ def fetch_pw_and_id(user_input):
         query = "SELECT password, id FROM users WHERE email = ?"
         cursor.execute(query, (user_input,))
         result = cursor.fetchone()  # will return a tuple
+        result = cursor.fetchone()  # will return a tuple
         conn.close()
 
         pw = result[0] if result else None
         id = result[1] if result else None
 
+    # check if user_input is username (1-16 characters started with letter)
     # check if user_input is username (1-16 characters started with letter)
     elif re.match(r"[a-zA-Z][a-zA-Z0-9]{0,15}", user_input):
         query = "SELECT password, id FROM users WHERE username = ?"
@@ -145,6 +152,7 @@ def fetch_pw_and_id(user_input):
         result = cursor.fetchone()
         conn.close()
 
+
         pw = result[0] if result else None
         id = int(user_input) - 10000
 
@@ -152,6 +160,7 @@ def fetch_pw_and_id(user_input):
         return (None, None)
 
     return (pw, id)
+
 
 
 def fetch_cur_cnt():
@@ -168,6 +177,7 @@ def fetch_cur_cnt():
     conn.close()
 
     return result[0] if result else None
+
 
 
 def fetch_user_info(id):
@@ -187,6 +197,7 @@ def fetch_user_info(id):
     return result if result else None
 
 
+
 def update_user_info(id, data):
     """
     根据id和输入的数据修改用户信息
@@ -198,6 +209,7 @@ def update_user_info(id, data):
     # do when data[key] is not None
     for key in data:
         if data[key] is not None and key != 'id':
+        if data[key] is not None and key != 'id':
             query += key + " = '" + str(data[key]) + "', "
 
     # only set to given id
@@ -206,6 +218,7 @@ def update_user_info(id, data):
 
     conn.commit()
     conn.close()
+
 
 
 def get_classroom_id(subject):
@@ -224,6 +237,7 @@ def get_classroom_id(subject):
     return result[0] if result else None
 
 
+
 def enter_classroom(id, classroom_id):
     """
     根据id和class_id修改用户信息和classroom信息
@@ -233,14 +247,19 @@ def enter_classroom(id, classroom_id):
 
     query = "UPDATE users SET classroom_id = " + \
         str(classroom_id) + " WHERE id = " + str(id)
+    query = "UPDATE users SET classroom_id = " + \
+        str(classroom_id) + " WHERE id = " + str(id)
     cursor.execute(query)
 
+    query = "UPDATE classrooms SET online_num = online_num + 1 WHERE id = " + \
+        str(classroom_id)
     query = "UPDATE classrooms SET online_num = online_num + 1 WHERE id = " + \
         str(classroom_id)
     cursor.execute(query)
 
     conn.commit()
     conn.close()
+
 
 
 def leave_classroom(id, classroom_id):
@@ -255,10 +274,13 @@ def leave_classroom(id, classroom_id):
 
     query = "UPDATE classrooms SET online_num = online_num - 1 WHERE id = " + \
         str(classroom_id)
+    query = "UPDATE classrooms SET online_num = online_num - 1 WHERE id = " + \
+        str(classroom_id)
     cursor.execute(query)
 
     conn.commit()
     conn.close()
+
 
 
 def get_study_time(id):
@@ -269,15 +291,18 @@ def get_study_time(id):
     cursor = conn.cursor()
 
     query = "SELECT study_time FROM users WHERE id = ?"
+    query = "SELECT study_time FROM users WHERE id = ?"
     cursor.execute(query, (id,))
 
     result = cursor.fetchone()
     conn.close()
     mins = result[0]
     hours = mins // 60  # 整除
+    hours = mins // 60  # 整除
     mins = mins % 60   # 取余
 
     return (hours, mins)
+
 
 
 def increase_study_time(id, mins):
@@ -289,10 +314,13 @@ def increase_study_time(id, mins):
 
     query = "UPDATE users SET study_time = study_time + " + \
         str(mins) + " WHERE id = " + str(id)
+    query = "UPDATE users SET study_time = study_time + " + \
+        str(mins) + " WHERE id = " + str(id)
     cursor.execute(query)
 
     conn.commit()
     conn.close()
+
 
 
 def get_online_num(classroom_id):
