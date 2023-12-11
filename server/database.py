@@ -339,7 +339,8 @@ def get_online_num(classroom_id):
 
 def get_question_list(classroom_id, page):
     """
-    获取classroom_id对应的最新的10个问题
+    获取从第page个问题开始的5个问题
+    page=0: 获取第1-5个问题
     """
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
@@ -350,9 +351,9 @@ def get_question_list(classroom_id, page):
             FROM questions join users \
             ON users.id = questions.user_id \
             WHERE questions.classroom_id = ? \
-            ORDER BY time DESC LIMIT 10 OFFSET ?"
+            ORDER BY time DESC LIMIT 5 OFFSET ?"
 
-    cursor.execute(query, (classroom_id, page * 10))
+    cursor.execute(query, (classroom_id, page))
 
     result = cursor.fetchall()
     conn.close()

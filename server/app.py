@@ -103,17 +103,11 @@ def get_user_info():
     else:
         image_url = url_for('static', filename=user_info['image'])
     # user_info['image'] = 'http://localhost:5001/' + user_info['image']
-    # user_info['image'] = 'http://localhost:5001/' + user_info['image']
     user_info['image'] = image_url
     # print(user_info['image'])
     if user_info is None:
         return jsonify(code=401, message="id error")
     else:
-        return jsonify(code=200,
-                       message="Get user info successful",
-                       userInfo=user_info)
-
-
         return jsonify(code=200,
                        message="Get user info successful",
                        userInfo=user_info)
@@ -199,9 +193,6 @@ def leave_classroom():
             return jsonify(code=409,
                            message="Classroom already empty, \
                             please check for error!")
-            return jsonify(code=409,
-                           message="Classroom already empty, \
-                            please check for error!")
         return jsonify(code=200, message="Leave classroom successful")
 
 
@@ -215,15 +206,6 @@ def get_study_info():
     # get online_num using classroom_id
     classroom_id = session.get('classroom_id')
     online_num = database.get_online_num(classroom_id)
-
-    return jsonify(code=200,
-                   message='Get success',
-                   studyInfo={
-                       'hour': hours,
-                       'minute': mins,
-                       'studytogether': online_num
-                   })
-
 
     return jsonify(code=200,
                    message='Get success',
