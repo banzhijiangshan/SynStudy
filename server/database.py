@@ -353,7 +353,7 @@ def insert_question(question, user_id, classroom_id):
     query = "INSERT INTO questions (user_id, classroom_id, title, tag, content, time) \
              VALUES (?, ?, ?, ?, ?, ?)"
     cursor.execute(query, (user_id, classroom_id, question["title"],
-                           "Default", 
+                           question["tag"] if "tag" in question else "Default", 
                            question["content"], question["askTime"]))
 
     #debug
