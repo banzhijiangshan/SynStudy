@@ -318,6 +318,8 @@ def get_question_content():
         processed_comment['content'] = comment[2]
         processed_comment['commentId'] = comment[4]
         processed_comment['replies'] = []
+        processed_comment['replyContent'] = None
+        processed_comment['canInputReply'] = 200
         reply_list = database.get_reply_list(comment[4])
         if reply_list is not None:
             for reply in reply_list:
@@ -332,7 +334,9 @@ def get_question_content():
                 processed_reply['fromUserNickName'] = reply[1]
                 processed_reply['toUserNickName'] = reply[2]
                 processed_reply['replyTime'] = reply[4]
-                processed_reply['replyContent'] = reply[3]
+                processed_reply['content'] = reply[3]
+                processed_reply['replyContent'] = None
+                processed_reply['canInputReply'] = 200
                 processed_comment['replies'].append(processed_reply)
         return_data['comments'].append(processed_comment)
 
