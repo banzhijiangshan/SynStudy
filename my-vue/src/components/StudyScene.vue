@@ -17,7 +17,7 @@
       <el-button type="primary" class="shift-button" @click="showSceneDialog">
         切换场景
       </el-button>
-      <el-button type="info" class="board-button" @click="showBoard">
+      <el-button type="primary" class="board-button" @click="showBoard">
         黑板
       </el-button>
       <el-button type="primary" class="back-button" @click="outclass">

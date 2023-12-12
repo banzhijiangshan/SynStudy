@@ -69,7 +69,9 @@
           <div class="list-top">
             <img :src="item.imageUrl" />
             <div style="margin-left: 6px; color: #2073e3; float: left">
-              <span style="float: left">{{ item.userName }}</span>
+              <span style="float: left; font-size: 16px">{{
+                item.userName
+              }}</span>
               <div style="width: 200px"></div>
               <span
                 style="
@@ -91,23 +93,25 @@
             <div class="list-main-text">
               <p>简述：{{ item.titleContent }}</p>
             </div>
-            <!--<div class="list-main-img">
-              <div v-for="img in item.imgUrls">
-                <el-image
-                  :src="img"
-                  fit="cover"
-                  :preview-src-list="item.imgUrls"
-                  @click="addClick(item.id)"
-                ></el-image>
-              </div>
-            </div>-->
+            <el-button
+              type="info"
+              class="info-button"
+              @click="toComment(item.id)"
+            >
+              查看详情
+            </el-button>
             <div style="width: 100%"></div>
           </div>
 
-          <div class="list-bottom">
-            <!--评论-->
-            <span @click="toComment(item.id)"> 问题详情 </span>
-          </div>
+          <!--<div class="list-bottom">
+            <el-button
+              type="info"
+              class="info-button"
+              @click="toComment(item.id)"
+            >
+              查看详情
+            </el-button>
+          </div>-->
         </li>
       </ul>
     </el-dialog>
@@ -500,9 +504,18 @@ export default {
         });
         return;
       }
+      let now = new Date();
+      let year = now.getFullYear();
+      let month = String(now.getMonth() + 1).padStart(2, "0");
+      let day = String(now.getDate()).padStart(2, "0");
+      let hours = String(now.getHours()).padStart(2, "0");
+      let minutes = String(now.getMinutes()).padStart(2, "0");
+      let seconds = String(now.getSeconds()).padStart(2, "0"); // 获取当前秒数
+      let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
       //请求
       instance
         .post("/addComment", {
+          time: formattedDateTime,
           questionId: this.currentQuestionId,
           content: tempComment,
         })
@@ -515,7 +528,7 @@ export default {
             this.textareaContent = "";
             this.backUrl = res.data.info.imageUrl;
             this.backUserName = res.data.info.userName;
-            this.backId = res.data.info.id;
+            this.backId = res.data.info.commentId;
           } else {
             this.$message({
               message: "发送失败",
@@ -524,14 +537,7 @@ export default {
           }
         });
       //用现有数据更新当前评论区
-      let now = new Date();
-      let year = now.getFullYear();
-      let month = String(now.getMonth() + 1).padStart(2, "0");
-      let day = String(now.getDate()).padStart(2, "0");
-      let hours = String(now.getHours()).padStart(2, "0");
-      let minutes = String(now.getMinutes()).padStart(2, "0");
-      let seconds = String(now.getSeconds()).padStart(2, "0"); // 获取当前秒数
-      let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
       let addComment = {
         id: this.backId,
         commenterUrl: this.backUrl,
@@ -718,10 +724,11 @@ export default {
   text-align: center;
 }
 
->>> .el-dialog {
+:deep() .el-dialog {
   height: 70% !important;
 }
->>> .el-dialog,
+
+:deep() .el-dialog,
 .el-pager li {
   background-color: rgba(255, 0, 0, 0);
   color: #ffffff;
@@ -746,39 +753,47 @@ export default {
 .list {
   position: absolute;
   margin-top: 4%;
-  margin-left: 12%;
+  margin-left: 13%;
   list-style-type: none;
   width: 76%;
-  height: 62%;
+  height: 63%;
 }
 
 .list-item {
-  margin: 3px;
   color: #000000;
   border-radius: 10px;
   padding: 5px;
   float: left;
   width: 90%;
+  margin-top: 1.5%;
 }
 
 .list-top img {
   width: 45px;
-  height: 48px;
+  height: 45px;
   border-radius: 50%;
   object-fit: fill;
 }
 
 .list-top {
+  position: relative;
   display: flex;
   align-items: center;
-  width: 300px;
+  width: 100%;
   flex-wrap: wrap;
+  margin-left: 0.8%;
+  margin-top: 0.8%;
 }
 
 .list-main {
+  position: relative;
   float: left;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.8%;
+  margin-left: 1.5%;
 }
 
 .list-main-text {
@@ -786,10 +801,13 @@ export default {
   float: left;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 700px;
+  width: 400px;
   display: -webkit-box;
   -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
+  font-family: Helvetica;
+  font-size: 16px;
+  margin-right: 180px;
 }
 
 .inputComment {
@@ -875,7 +893,7 @@ export default {
 .comment-li-content {
   margin-left: 7%;
   width: 86%;
-  font-size: 18px;
+  font-size: 14px;
   clear: left;
   float: left;
   padding: 5px;
@@ -1006,5 +1024,11 @@ export default {
   float: right;
   cursor: pointer;
   height: 24px;
+}
+
+.info-button {
+  border-radius: 10px;
+  border: none;
+  color: white;
 }
 </style>
