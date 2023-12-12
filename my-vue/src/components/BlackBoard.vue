@@ -7,11 +7,14 @@
       :height="400"
       :before-close="handleClose"
       :show-close="false"
+      class="board-dialog"
     >
       <el-button type="primary" class="back-button" @click="backToStudy">
       </el-button>
 
       <el-button type="primary" ref="buttonRef" class="new-button"> </el-button>
+      <el-button type="primary" ref="myRef" class="my-button"> </el-button>
+
       <el-popover
         ref="popoverRef"
         :virtual-ref="buttonRef"
@@ -45,12 +48,97 @@
           <el-form-item>
             <el-button
               type="primary"
-              @click="submitQuestion"
+              @click="editQuestion"
               class="submit-button"
               >提交</el-button
             >
           </el-form-item>
         </el-form>
+      </el-popover>
+
+      <el-popover
+        ref="myRef"
+        :virtual-ref="myRef"
+        trigger="click"
+        title="我的问题"
+        :width="450"
+        center="true"
+        virtual-triggering
+        placement="top"
+        align="center"
+        @show="getMyQuestions"
+      >
+        <ul class="list">
+          <li
+            v-for="(item, index) in myQuestions"
+            class="list-item"
+            :key="index"
+            :style="{ backgroundColor: getColor(index) }"
+          >
+            <div class="list-main">
+              <div class="list-main-text">
+                <p>简述：{{ item.titleContent }}</p>
+              </div>
+              <el-button
+                type="info"
+                class="my-info-button"
+                @click="toComment(item.id)"
+              >
+                详情
+              </el-button>
+              <el-button
+                type="primary"
+                class="edit-button"
+                @click="openEdit(item)"
+              >
+                编辑
+              </el-button>
+              <el-button
+                type="danger"
+                class="delete-button"
+                @click="deleteQuestion(index)"
+              >
+                删除
+              </el-button>
+              <div style="width: 100%"></div>
+            </div>
+            <span v-if="item.isEdit" class="editArea">
+              <el-form>
+                <el-form-item label="简述:">
+                  <el-input
+                    v-model="currentEditTitle"
+                    maxlength="20"
+                    show-word-limit
+                  ></el-input>
+                </el-form-item>
+                <el-form-item label="内容:">
+                  <el-input
+                    type="textarea"
+                    v-model="currentEditContent"
+                    autosize
+                    maxlength="200"
+                    show-word-limit
+                  >
+                  </el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-button
+                    type="primary"
+                    @click="submitEdit(item.id)"
+                    class="submit-button"
+                    >提交</el-button
+                  >
+                  <el-button
+                    type="warning"
+                    @click="closeEdit(item)"
+                    class="submit-button"
+                    >退出</el-button
+                  >
+                </el-form-item>
+              </el-form>
+            </span>
+          </li>
+        </ul>
       </el-popover>
 
       <ul
@@ -103,16 +191,6 @@
             </el-button>
             <div style="width: 100%"></div>
           </div>
-
-          <!--<div class="list-bottom">
-            <el-button
-              type="info"
-              class="info-button"
-              @click="toComment(item.id)"
-            >
-              查看详情
-            </el-button>
-          </div>-->
         </li>
       </ul>
     </el-dialog>
@@ -155,6 +233,7 @@
             style="width: 100%; height: 200px; resize: none"
             readonly
             class="styled-textarea"
+            autosize
           >
           </textarea>
         </div>
@@ -224,15 +303,6 @@
                   class="styled-reply"
                 >
                 </el-input>
-                <!--<span
-                  style="
-                    text-align: left;
-                    float: left;
-                    cursor: pointer;
-                    white-space: pre-wrap;
-                  "
-                  >{{ com.content }}</span
-                >-->
               </div>
               <div class="inputReply" v-if="com.openReply">
                 <textarea
@@ -354,25 +424,8 @@ import instance from "@/axios";
 import { ElMessage } from "element-plus";
 import { ref } from "vue";
 
-export default {
-  name: "BlackBoard",
-  data() {
-    return {
-      currentQuestionId: "",
-      dialogVisible: false,
-      allQuestions: [],
-      page: 0,
-      loadFinished: false,
-      questionForm: {
-        title: "",
-        content: "",
-      },
-      loading: false,
-      currentAsker: "Alice",
-      currentAskTime: "2021-06-01 11:00",
-      currentContent: "",
-      currentComments: [],
-      /*{
+/*评论结构参考：
+        {
           id: 1,
           commenterUrl: "",
           userName: "Bob",
@@ -394,22 +447,46 @@ export default {
           replyContent: "",
           canInputReply: 200,
         },*/
+export default {
+  name: "BlackBoard",
+  data() {
+    return {
+      currentQuestionId: "",
+      dialogVisible: false,
+      allQuestions: [],
+      page: 0,
+      loadFinished: false,
+      questionForm: {
+        title: "",
+        content: "",
+      },
+      loading: false,
+      currentAsker: "Alice",
+      currentAskTime: "2021-06-01 11:00",
+      currentContent: "",
+      currentComments: [],
       avatarUrl: "", //当前问题的提问者的头像
       canInputText: 200,
       textareaContent: "",
       backUrl: "", //后端传回
       backUserName: "", //后端传回
       backId: "",
+
+      myQuestions: [], //我的问题
+      currentEditContent: "",
+      currentEditTitle: "",
     };
   },
   setup() {
     const buttonRef = ref(null);
     const popoverRef = ref(null);
+    const myRef = ref(null);
     const drawer = ref(false);
 
     return {
       buttonRef,
       popoverRef,
+      myRef,
       drawer,
     };
   },
@@ -700,6 +777,101 @@ export default {
     },
     closeReplySon(reply) {
       reply.openReply = false;
+    },
+    openEdit(item) {
+      item.isEdit = true;
+      this.currentEditContent = item.content;
+    },
+    closeEdit(item) {
+      item.isEdit = false;
+      this.currentEditContent = "";
+    },
+    getMyQuestions() {
+      instance.get("/getMyQuestions").then((res) => {
+        if (res.data.code === 200) {
+          this.myQuestions = [];
+          for (let i = 0; i < res.data.questions.length; i++) {
+            let tempQuestion = {
+              id: res.data.questions[i].id,
+              titleContent: res.data.questions[i].titleContent,
+              content: res.data.questions[i].content,
+              isEdit: false,
+            };
+            this.myQuestions.push(tempQuestion);
+          }
+        }
+      });
+    },
+    deleteQuestion(index) {
+      instance
+        .post("/deleteQuestion", {
+          questionId: this.myQuestions[index].id,
+        })
+        .then((res) => {
+          if (res.data.code === 200) {
+            //从allQuestions中删除
+            for (let i = 0; i < this.allQuestions.length; i++) {
+              if (this.allQuestions[i].id === this.myQuestions[index].id) {
+                this.allQuestions.splice(i, 1);
+                break;
+              }
+            }
+            this.myQuestions.splice(index, 1);
+            ElMessage({
+              message: "删除成功",
+              type: "success",
+            });
+          } else {
+            ElMessage({
+              message: "删除失败",
+              type: "error",
+            });
+          }
+        });
+    },
+    submitEdit(id) {
+      if (this.currentEditContent === "" || this.currentEditTitle === "") {
+        ElMessage({
+          message: "标题或内容不能为空",
+          type: "error",
+        });
+        return;
+      }
+      instance
+        .post("/editQuestion", {
+          questionId: id,
+          title: this.currentEditTitle,
+          content: this.currentEditContent,
+        })
+        .then((res) => {
+          if (res.data.code === 200) {
+            ElMessage({
+              message: "修改成功",
+              type: "success",
+            });
+            for (let i = 0; i < this.myQuestions.length; i++) {
+              if (this.myQuestions[i].id === id) {
+                this.myQuestions[i].content = this.currentEditContent;
+                this.myQuestions[i].titleContent = this.currentEditTitle;
+                this.myQuestions[i].isEdit = false;
+                break;
+              }
+            }
+            for (let i = 0; i < this.allQuestions.length; i++) {
+              if (this.allQuestions[i].id === id) {
+                this.allQuestions[i].titleContent = this.currentEditTitle;
+                break;
+              }
+            }
+            this.currentEditContent = "";
+            this.currentEditTitle = "";
+          } else {
+            ElMessage({
+              message: "修改失败",
+              type: "error",
+            });
+          }
+        });
     },
   },
 };
@@ -1112,5 +1284,23 @@ export default {
   border: none !important;
   box-shadow: none !important;
   resize: none !important;
+}
+
+.my-info-button {
+  border-radius: 10px;
+  border: none;
+  color: white;
+}
+
+.edit-button {
+  border-radius: 10px;
+  border: none;
+  color: white;
+}
+
+.delete-button {
+  border-radius: 10px;
+  border: none;
+  color: white;
 }
 </style>
