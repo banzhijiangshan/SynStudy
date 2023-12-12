@@ -859,7 +859,6 @@ export default {
             }
             for (let i = 0; i < this.allQuestions.length; i++) {
               if (this.allQuestions[i].id === id) {
-                this.allQuestions[i].content = this.currentEditContent;
                 this.allQuestions[i].titleContent = this.currentEditTitle;
                 break;
               }
