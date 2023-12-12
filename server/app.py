@@ -107,6 +107,10 @@ def get_user_info():
     # user_info['image'] = 'http://localhost:5001/' + user_info['image']
     user_info['image'] = image_url
     # print(user_info['image'])
+
+    # debug
+    print("app.get_user_info returns: ", user_info)
+
     if user_info is None:
         return jsonify(code=401, message="id error")
     else:
@@ -335,6 +339,9 @@ def get_question_content():
                 processed_reply['replyContent'] = reply[3]
                 processed_comment['replies'].append(processed_reply)
         return_data['comments'].append(processed_comment)
+    
+    # debug
+    print("app.get_question_content returns: ", return_data)
 
     return jsonify(code=200,
                     message="Get question successful",
