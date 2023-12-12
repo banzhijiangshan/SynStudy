@@ -415,7 +415,6 @@ export default {
                 this.loadFinished = true;
               }
             }
-            console.log("返回", res);
             this.loading = false;
           });
       } else {
@@ -477,9 +476,10 @@ export default {
           this.currentAskTime = res.data.question.askTime;
           this.currentContent = res.data.question.content;
           this.currentComments = res.data.question.comments;
-          this.avatarUrl = res.data.question.imageUrl;
+          this.avatarUrl = res.data.question.avatarUrl;
           this.currentQuestionId = id;
         }
+        console.log("详情", res);
         this.drawer = true;
       });
     },
@@ -535,21 +535,20 @@ export default {
               type: "error",
             });
           }
+          //用现有数据更新当前评论区
+          let addComment = {
+            id: this.backId,
+            commenterUrl: this.backUrl,
+            userName: this.backUserName,
+            commentTime: formattedDateTime,
+            content: tempComment,
+            openReply: false,
+            replies: [],
+            replyContent: "",
+            canInputReply: 200,
+          };
+          this.currentComments.push(addComment);
         });
-      //用现有数据更新当前评论区
-
-      let addComment = {
-        id: this.backId,
-        commenterUrl: this.backUrl,
-        userName: this.backUserName,
-        commentTime: formattedDateTime,
-        content: tempComment,
-        openReply: false,
-        replies: [],
-        replyContent: "",
-        canInputReply: 200,
-      };
-      this.currentComments.push(addComment);
     },
     openReply(com) {
       com.openReply = true;
@@ -590,6 +589,7 @@ export default {
         fromUserNickName: fromUserNickName,
         fromUserAvatarUrl: fromUserAvatarUrl,
       };
+      console.log(reply);
       this.currentComments[index].replies.push(reply);
       instance.post("/sentReply", reply).then((res) => {
         if (res.data.code === 200) {
