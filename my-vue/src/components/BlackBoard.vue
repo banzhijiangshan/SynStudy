@@ -69,9 +69,10 @@
           <div class="list-top">
             <img :src="item.imageUrl" />
             <div style="margin-left: 6px; color: #2073e3; float: left">
-              <span style="float: left; font-size: 16px">{{
-                item.userName
-              }}</span>
+              <span
+                style="float: left; font-size: 16px; font-family: Helvetica"
+                >{{ item.userName }}</span
+              >
               <div style="width: 200px"></div>
               <span
                 style="
@@ -125,17 +126,21 @@
       <template #default>
         <div class="list-top">
           <img :src="avatarUrl" />
-          <div style="margin-left: 6px; color: #2073e3; float: left">
-            <span style="float: left">{{ currentAsker }}</span>
+          <div style="margin-left: 6px; color: #000000; float: left">
+            <span
+              style="float: left; font-size: 16px; font-family: Helvetica"
+              >{{ currentAsker }}</span
+            >
             <div style="width: 200px"></div>
             <span
               style="
                 position: relative;
                 float: left;
-                font-size: 16px;
+                font-size: 15px;
+                font-family: Helvetica;
                 align-items: center;
                 display: flex;
-                color: #a426ce;
+                color: #052bd5;
                 left: 40%;
               "
             >
@@ -169,6 +174,7 @@
               float: left;
               left: 3%;
               bottom: 5%;
+              font-family: Helvetica;
             "
             >还可以输入{{ canInputText }}个字符</span
           >
@@ -194,26 +200,44 @@
                   style="cursor: pointer; margin-left: auto; font-size: 16px"
                   @click="openReply(com, index)"
                 >
-                  回复</span
+                  <el-button type="warning" class="reply-button"
+                    >回复</el-button
+                  ></span
                 >
                 <span
                   v-if="com.openReply"
-                  style="cursor: pointer; margin-left: auto; font-size: 16px"
+                  style="cursor: pointer; margin-left: auto; font-size: 14px"
                   @click="closeReply(index)"
                 >
-                  收起</span
+                  <el-button type="success" class="reply-button"
+                    >收起</el-button
+                  ></span
                 >
               </div>
 
               <div class="comment-li-content" @click="openReply(com, index)">
-                <span style="text-align: left; float: left; cursor: pointer">{{
-                  com.content
-                }}</span>
+                <el-input
+                  type="textarea"
+                  v-model="com.content"
+                  readonly
+                  autosize
+                  class="styled-reply"
+                >
+                </el-input>
+                <!--<span
+                  style="
+                    text-align: left;
+                    float: left;
+                    cursor: pointer;
+                    white-space: pre-wrap;
+                  "
+                  >{{ com.content }}</span
+                >-->
               </div>
               <div class="inputReply" v-if="com.openReply">
                 <textarea
                   v-model="com.replyContent"
-                  :placeholder="'回复@' + com.userName + ': '"
+                  :placeholder="'回复@ ' + com.userName + ': '"
                   maxlength="200"
                   @input="calcInputReply(index)"
                 >
@@ -225,10 +249,11 @@
                     float: left;
                     left: 3%;
                     bottom: 5%;
+                    font-family: Helvetica;
                   "
                   >还可以输入{{ com.canInputReply }}个字符</span
                 >
-                <span class="sent" @click="sentReply(com, index)">回复</span>
+                <span class="sent" @click="sentReply(com, index)">发表</span>
               </div>
               <!--回复列表-->
               <ul class="reply-ul">
@@ -241,7 +266,7 @@
                     <img :src="reply.fromUserAvatarUrl" />
                     <span class="reply-nickName"
                       >{{ reply.fromUserNickName }}
-                      <span style="font-size: 15px; margin: 3px; color: #000000"
+                      <span style="font-size: 13px; margin: 1px; color: #000000"
                         >回复</span
                       >
                       {{ reply.toUserNickName }}</span
@@ -258,7 +283,9 @@
                       "
                       @click="openReplySon(reply)"
                     >
-                      回复</span
+                      <el-button type="warning" class="reply-button"
+                        >回复</el-button
+                      ></span
                     >
                     <span
                       v-if="reply.openReply"
@@ -269,17 +296,29 @@
                       "
                       @click="closeReplySon(reply)"
                     >
-                      收起</span
+                      <el-button type="success" class="reply-button"
+                        >收起</el-button
+                      ></span
                     >
                   </div>
                   <div class="reply-li-content">
-                    <span style="float: left">{{ reply.content }}</span>
+                    <el-input
+                      type="textarea"
+                      v-model="reply.content"
+                      readonly
+                      autosize
+                      class="styled-reply"
+                    >
+                    </el-input>
+                    <!--<span style="float: left; white-space: pre-wrap">{{
+                      reply.content
+                    }}</span>-->
                   </div>
 
                   <div class="inputReplySon" v-show="reply.openReply">
                     <textarea
                       v-model="reply.replyContent"
-                      :placeholder="'回复@' + reply.fromUserNickName + ': '"
+                      :placeholder="'回复@ ' + reply.fromUserNickName + ': '"
                       maxlength="200"
                       @input="calcReplySon(index, index1)"
                     >
@@ -295,7 +334,7 @@
                       >还可以输入{{ reply.canInputReply }}个字符</span
                     >
                     <span class="sent" @click="sentReplySon(com, index, reply)"
-                      >回复</span
+                      >发表</span
                     >
                   </div>
                 </li>
@@ -332,7 +371,6 @@ export default {
       currentAsker: "Alice",
       currentAskTime: "2021-06-01 11:00",
       currentContent: "",
-      //"有ABC三个神,只知他们名为“真实、虚谎、任性”,但不知哪个代号属于哪个名字。真实之神只说真话，虚谎之神只说假话,而任性之神会随机地说真话或假话。我们的任务是找出ABC的身份。我们一共可以问他们三个问题，且问题必须是用“是”或“否回答的问题，每次只能向其中一个神发问但可以问同一个神多个问题。神只会用他们的语言回答“da”或“ja”,其中一个代表“是”，一个代表“否”,但我们不知道哪个回答是哪个意思。如何提问才能区分出三个神的身份?",
       currentComments: [],
       /*{
           id: 1,
@@ -392,9 +430,9 @@ export default {
       this.dialogVisible = false;
     },
     getColor(index) {
-      const colors = ["#FFC0CB", "#ADD8E6", "#CFFECF", "#FDF9D4", "#D4D4D4"]; // 定义不同的颜色值数组
-      const colorIndex = index % colors.length; // 每三个表项为一个循环
-      return colors[colorIndex]; // 返回对应索引的颜色值
+      const colors = ["#FFC0CB", "#ADD8E6", "#CFFECF", "#FDF9D4", "#D4D4D4"];
+      const colorIndex = index % colors.length;
+      return colors[colorIndex];
     },
 
     //后端回传格式：code, data:{questions:[{id, titleContent, imageUrl, userName, askTime}]}
@@ -475,6 +513,7 @@ export default {
           this.currentAsker = res.data.question.userName;
           this.currentAskTime = res.data.question.askTime;
           this.currentContent = res.data.question.content;
+          this.currentComments = [];
           for (let i = 0; i < res.data.question.comments.length; i++) {
             let tempComment = {
               id: res.data.question.comments[i].commentId,
@@ -637,7 +676,7 @@ export default {
         fromUserNickName = res.data.userInfo.username;
         fromUserAvatarUrl = res.data.userInfo.image;
         let replySon = {
-          commentId: reply.commentId,
+          commentId: com.id,
           content: reply.replyContent,
           replyTime: formattedDateTime,
           toUserNickName: reply.fromUserNickName,
@@ -651,6 +690,7 @@ export default {
           if (res.data.code === 200) {
             reply.replyContent = "";
             reply.openReply = false;
+            reply.canInputReply = 200;
           }
         });
       });
@@ -861,6 +901,7 @@ export default {
   color: white;
   padding: 2px 15px;
   font-size: 16px;
+  font-family: Helvetica;
   float: right;
   cursor: pointer;
   height: 25px;
@@ -918,11 +959,14 @@ export default {
   padding: 5px;
   cursor: pointer;
   overflow: auto;
+  white-space: pre-wrap;
+  font-family: Helvetica;
 }
 
 .comment-nickName {
-  font-size: 18px;
+  font-size: 15px;
   color: #2073e3;
+  font-family: Helvetica;
 }
 
 .inputReply {
@@ -957,10 +1001,11 @@ export default {
   background-color: #ee464b;
   color: white;
   padding: 2px 15px;
-  font-size: 16px;
+  font-size: 14px;
+  font-family: Helvetica;
   float: right;
   cursor: pointer;
-  height: 25px;
+  height: 22px;
 }
 .reply-ul {
   margin: 0;
@@ -1000,11 +1045,15 @@ export default {
   float: left;
   padding: 5px;
   cursor: pointer;
+  white-space: pre-wrap;
+  font-family: Helvetica;
 }
 
 .reply-nickName {
-  font-size: 16px;
+  font-size: 13px;
   color: #2073e3;
+  margin-left: 6px;
+  font-family: Helvetica;
 }
 
 .inputReplySon {
@@ -1039,15 +1088,29 @@ export default {
   background-color: #ee464b;
   color: white;
   padding: 2px 15px;
-  font-size: 16px;
+  font-size: 14px;
+  font-family: Helvetica;
   float: right;
   cursor: pointer;
-  height: 24px;
+  height: 22px;
 }
 
 .info-button {
   border-radius: 10px;
   border: none;
   color: white;
+}
+
+.reply-button {
+  border: none;
+  font-size: 13px;
+  height: 27px;
+  width: 45px;
+}
+
+.styled-reply :deep(.el-textarea__inner) {
+  border: none !important;
+  box-shadow: none !important;
+  resize: none !important;
 }
 </style>
