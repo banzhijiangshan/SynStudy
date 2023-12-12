@@ -479,7 +479,6 @@ export default {
           this.avatarUrl = res.data.question.avatarUrl;
           this.currentQuestionId = id;
         }
-        console.log("详情", res);
         this.drawer = true;
       });
     },
@@ -548,6 +547,7 @@ export default {
             canInputReply: 200,
           };
           this.currentComments.push(addComment);
+          this.canInputText = 200;
         });
     },
     openReply(com) {
@@ -580,22 +580,22 @@ export default {
       instance.get("/getUserInfo").then((res) => {
         fromUserNickName = res.data.userInfo.username;
         fromUserAvatarUrl = res.data.userInfo.image;
-      });
-      let reply = {
-        commentId: com.id,
-        content: com.replyContent,
-        replyTime: formattedDateTime,
-        toUserNickName: com.userName,
-        fromUserNickName: fromUserNickName,
-        fromUserAvatarUrl: fromUserAvatarUrl,
-      };
-      console.log(reply);
-      this.currentComments[index].replies.push(reply);
-      instance.post("/sentReply", reply).then((res) => {
-        if (res.data.code === 200) {
-          com.replyContent = "";
-          com.openReply = false;
-        }
+        let reply = {
+          commentId: com.id,
+          content: com.replyContent,
+          replyTime: formattedDateTime,
+          toUserNickName: com.userName,
+          fromUserNickName: fromUserNickName,
+          fromUserAvatarUrl: fromUserAvatarUrl,
+        };
+        this.currentComments[index].replies.push(reply);
+        instance.post("/sentReply", reply).then((res) => {
+          if (res.data.code === 200) {
+            com.replyContent = "";
+            com.openReply = false;
+            com.canInputReply = 200;
+          }
+        });
       });
     },
     sentReplySon(com, index, reply) {
@@ -619,21 +619,21 @@ export default {
       instance.get("/getUserInfo").then((res) => {
         fromUserNickName = res.data.userInfo.username;
         fromUserAvatarUrl = res.data.userInfo.image;
-      });
-      let replySon = {
-        commentId: reply.commentId,
-        content: reply.replyContent,
-        replyTime: formattedDateTime,
-        toUserNickName: reply.fromUserNickName,
-        fromUserNickName: fromUserNickName,
-        fromUserAvatarUrl: fromUserAvatarUrl,
-      };
-      this.currentComments[index].replies.push(replySon);
-      instance.post("/sentReply", replySon).then((res) => {
-        if (res.data.code === 200) {
-          reply.replyContent = "";
-          reply.openReply = false;
-        }
+        let replySon = {
+          commentId: reply.commentId,
+          content: reply.replyContent,
+          replyTime: formattedDateTime,
+          toUserNickName: reply.fromUserNickName,
+          fromUserNickName: fromUserNickName,
+          fromUserAvatarUrl: fromUserAvatarUrl,
+        };
+        this.currentComments[index].replies.push(replySon);
+        instance.post("/sentReply", replySon).then((res) => {
+          if (res.data.code === 200) {
+            reply.replyContent = "";
+            reply.openReply = false;
+          }
+        });
       });
     },
     openReplySon(reply) {
