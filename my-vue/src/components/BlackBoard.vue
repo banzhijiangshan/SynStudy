@@ -491,7 +491,7 @@ export default {
       this.currentComments[index].canInputReply = 200 - len;
     },
     calcReplySon(index, index1) {
-      let len = this.currentComments[index].replies[index1].content.length;
+      let len = this.currentComments[index].replies[index1].replyContent.length;
       this.currentComments[index].replies[index1].canInputReply = 200 - len;
     },
     sentComment() {
@@ -587,6 +587,8 @@ export default {
           toUserNickName: com.userName,
           fromUserNickName: fromUserNickName,
           fromUserAvatarUrl: fromUserAvatarUrl,
+          replyContent: "",
+          canInputReply: 200,
         };
         this.currentComments[index].replies.push(reply);
         instance.post("/sentReply", reply).then((res) => {
@@ -626,6 +628,8 @@ export default {
           toUserNickName: reply.fromUserNickName,
           fromUserNickName: fromUserNickName,
           fromUserAvatarUrl: fromUserAvatarUrl,
+          replyContent: "",
+          canInputReply: 200,
         };
         this.currentComments[index].replies.push(replySon);
         instance.post("/sentReply", replySon).then((res) => {
@@ -976,7 +980,7 @@ export default {
 .reply-li-content {
   margin-left: 8%;
   width: 82%;
-  font-size: 16px;
+  font-size: 14px;
   clear: left;
   float: left;
   padding: 5px;
