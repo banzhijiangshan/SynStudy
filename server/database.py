@@ -476,5 +476,58 @@ def insert_reply(reply, user_id, comment_id):
     conn.commit()
     conn.close()
 
+
+def get_my_question_list(id):
+    """
+    根据用户id获取用户提出的问题列表
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    # 获取questions的id, title和content
+    query = "SELECT id, title, content \
+            FROM questions \
+            WHERE user_id = ?"
+
+    cursor.execute(query, (id,))
+
+    result = cursor.fetchall()
+    conn.close()
+
+    # debug
+    print("get_my_question_list result", result)
+
+    return result if result else None
+
+
+def delete_question(question_id):
+    """
+    根据问题id删除问题
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "DELETE FROM questions WHERE id = ?"
+    cursor.execute(query, (question_id,))
+
+    conn.commit()
+    conn.close()
+
+
+def edit_question(editted_question, question_id):
+    """
+    根据问题id修改问题
+    """
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+
+    query = "UPDATE questions SET title = ?, content = ? WHERE id = ?"
+    cursor.execute(query, (editted_question["title"], editted_question["content"], question_id))
+
+    conn.commit()
+    conn.close()
+
+
+
 if __name__ == "__main__":
     create_db()
