@@ -528,7 +528,7 @@ export default {
             this.textareaContent = "";
             this.backUrl = res.data.info.imageUrl;
             this.backUserName = res.data.info.userName;
-            this.backId = res.data.info.id;
+            this.backId = res.data.info.commentId;
           } else {
             this.$message({
               message: "发送失败",
