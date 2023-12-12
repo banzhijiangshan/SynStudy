@@ -475,11 +475,25 @@ export default {
           this.currentAsker = res.data.question.userName;
           this.currentAskTime = res.data.question.askTime;
           this.currentContent = res.data.question.content;
-          this.currentComments = res.data.question.comments;
+          for (let i = 0; i < res.data.question.comments.length; i++) {
+            let tempComment = {
+              id: res.data.question.comments[i].commentId,
+              commenterUrl: res.data.question.comments[i].commenterUrl,
+              userName: res.data.question.comments[i].userName,
+              commentTime: res.data.question.comments[i].commentTime,
+              content: res.data.question.comments[i].content,
+              openReply: false,
+              replies: res.data.question.comments[i].replies,
+              replyContent: "",
+              canInputReply: 200,
+            };
+            this.currentComments.push(tempComment);
+          }
           this.avatarUrl = res.data.question.avatarUrl;
           this.currentQuestionId = id;
         }
         this.drawer = true;
+        console.log("pinglun", this.currentComments);
       });
     },
     calcInput() {
@@ -590,6 +604,7 @@ export default {
           replyContent: "",
           canInputReply: 200,
         };
+        console.log("reply", reply);
         this.currentComments[index].replies.push(reply);
         instance.post("/sentReply", reply).then((res) => {
           if (res.data.code === 200) {
