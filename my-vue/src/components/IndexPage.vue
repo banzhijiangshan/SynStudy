@@ -16,7 +16,7 @@
                   class="el-input"
                   maxlength="30"
                   show-word-limit
-                  placeholder="学号/用户名/邮箱"
+                  placeholder="学号/邮箱"
                   v-model="form.name"
                 />
               </el-form-item>
@@ -78,6 +78,10 @@ const form = reactive({
 });
 
 const login = async () => {
+  if (!form.name || !form.password) {
+    ElMessage.error("用户名或密码为空");
+    return;
+  }
   instance
     .post("/login", {
       name: form.name,

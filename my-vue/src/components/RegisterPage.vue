@@ -109,9 +109,32 @@ const form = reactive({
 
 const router = useRouter();
 
+function validateEmail(email) {
+  const emailRegex =
+    /^[^\s\u4E00-\u9FFF@]+@[^\s\u4E00-\u9FFF@.]+(\.[^\s\u4E00-\u9FFF@.]+)+$/; // 正则表达式匹配邮箱格式
+  return emailRegex.test(email); // 检查输入的邮箱是否匹配正则表达式
+}
+
+function validatePassword(password) {
+  const passwordRegex = /^[a-zA-Z\d@$!%*?&]{6,30}$/; // 正则表达式匹配密码格式
+  return passwordRegex.test(password); // 检查输入的密码是否匹配正则表达式
+}
+
 const commit = async () => {
+  if (!form.name || !form.password || !form.email) {
+    ElMessage.error("请填写完整信息");
+    return;
+  }
   if (form.password !== form.repeatpassword) {
     ElMessage.error("两次输入的密码不一致");
+    return;
+  }
+  if (!validatePassword(form.password)) {
+    ElMessage.error("密码仅能包含大小写字母、数字和特殊字符，长度为6-30位");
+    return;
+  }
+  if (!validateEmail(form.email)) {
+    ElMessage.error("邮箱格式不正确");
     return;
   }
   instance

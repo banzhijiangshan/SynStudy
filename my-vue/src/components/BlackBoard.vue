@@ -48,7 +48,7 @@
           <el-form-item>
             <el-button
               type="primary"
-              @click="editQuestion"
+              @click="submitQuestion"
               class="submit-button"
               >提交</el-button
             >
