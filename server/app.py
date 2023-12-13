@@ -36,8 +36,14 @@ def register():
         processed_data['password'])
     try:
         database.insert_register_data(processed_data)
-    except sqlite3.IntegrityError:
-        return jsonify(code=409, message="Username already exists!")
+    except sqlite3.IntegrityError as err:
+        if "users.email" in str(err).split():
+            message = "Email already exists!"
+        elif "users.username" in str(err).split():
+            message = "Username already exists!"
+        else:
+            message = str(err)
+        return jsonify(code=409, message=message)
 
     return jsonify(code=200, message="Register successful")
 
