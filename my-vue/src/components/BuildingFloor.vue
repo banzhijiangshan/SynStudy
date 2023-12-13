@@ -58,6 +58,7 @@
 import PersonalDia from "./UserInfo.vue";
 import InfoDia from "./MoreInfo.vue";
 import instance from "@/axios";
+import { ElMessage } from "element-plus";
 
 export default {
   components: {
@@ -135,9 +136,19 @@ export default {
       this.$router.push("/second");
     },
     heartBeat() {
-      instance.post("/heartBeat", {
-        messsage: "I am alive!",
-      });
+      instance
+        .post("/heartbeat", {
+          messsage: "I am alive!",
+        })
+        .then((res) => {
+          if (res.data.valid === 0) {
+            this.$router.push("/login");
+            ElMessage({
+              message: "登录已失效",
+              type: "error",
+            });
+          }
+        });
     },
   },
   beforeUnmount() {

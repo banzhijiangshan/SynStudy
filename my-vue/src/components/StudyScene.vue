@@ -170,9 +170,19 @@ export default {
       instance.get("/getStudyInfo").then((res) => {
         this.studytogether = res.data.studyInfo.studytogether;
       });
-      instance.post("/heartBeat", {
-        message: "I'm alive!",
-      });
+      instance
+        .post("/heartbeat", {
+          message: "I'm alive!",
+        })
+        .then((res) => {
+          if (res.data.valid === 0) {
+            this.$router.push("/login");
+            ElMessage({
+              message: "登录已失效",
+              type: "error",
+            });
+          }
+        });
     },
     showSceneDialog() {
       this.dialogVis = true;
