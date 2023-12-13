@@ -71,7 +71,7 @@ def create_db():
                     content VARCHAR(255) NOT NULL,
                     time VARCHAR(255) NOT NULL,
                     FOREIGN KEY (user_id) REFERENCES users(id),
-                    FOREIGN KEY (question_id) REFERENCES questions(id))''')
+                    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE)''')
 
     # create reply table (id, user_id, comment_id, content, time, reply_to_id)
     # reply_to_id is the id of reply that this reply replies to
@@ -84,7 +84,7 @@ def create_db():
                     time VARCHAR(255) NOT NULL,
                     reply_to_username VARCHAR(255) NOT NULL,
                     FOREIGN KEY (user_id) REFERENCES users(id),
-                    FOREIGN KEY (comment_id) REFERENCES comments(id))''')
+                    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE)''')
 
     # add math, phy, chem classrooms
     c.execute("INSERT INTO classrooms (subject) VALUES ('math')")
@@ -106,8 +106,13 @@ def insert_register_data(data):
     password = data["password"]
     email = data["email"]
 
-    c.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
-              (username, password, email))
+    try:
+        c.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
+                (username, password, email))
+    except sqlite3.IntegrityError as err:
+        conn.rollback()
+        conn.close()
+        raise err
 
     conn.commit()
     conn.close()
@@ -126,16 +131,6 @@ def fetch_pw_and_id(user_input):
         query = "SELECT password, id FROM users WHERE email = ?"
         cursor.execute(query, (user_input,))
         result = cursor.fetchone()  # will return a tuple
-        conn.close()
-
-        pw = result[0] if result else None
-        id = result[1] if result else None
-
-    # check if user_input is username (1-16 characters started with letter)
-    elif re.match(r"[a-zA-Z][a-zA-Z0-9]{0,15}", user_input):
-        query = "SELECT password, id FROM users WHERE username = ?"
-        cursor.execute(query, (user_input,))
-        result = cursor.fetchone()
         conn.close()
 
         pw = result[0] if result else None
@@ -209,8 +204,14 @@ def update_user_info(id, data):
 
     # only set to given id
     query = query[:-2] + " WHERE id = " + str(id)
-    cursor.execute(query)
 
+    try:
+        cursor.execute(query)
+    except sqlite3.IntegrityError as err:
+        conn.rollback()
+        conn.close()
+        raise err
+    
     conn.commit()
     conn.close()
 
@@ -246,7 +247,13 @@ def enter_classroom(id, classroom_id):
 
     query = "UPDATE classrooms SET online_num = online_num + 1 WHERE id = " + \
         str(classroom_id)
-    cursor.execute(query)
+    
+    try:
+        cursor.execute(query)
+    except sqlite3.IntegrityError as err:
+        conn.rollback()
+        conn.close()
+        raise err
 
     conn.commit()
     conn.close()
@@ -265,7 +272,13 @@ def leave_classroom(id, classroom_id):
 
     query = "UPDATE classrooms SET online_num = online_num - 1 WHERE id = " + \
         str(classroom_id)
-    cursor.execute(query)
+    
+    try:
+        cursor.execute(query)
+    except sqlite3.IntegrityError as err:
+        conn.rollback()
+        conn.close()
+        raise err
 
     conn.commit()
     conn.close()
@@ -361,9 +374,15 @@ def insert_question(question, user_id, classroom_id):
 
     query = "INSERT INTO questions (user_id, classroom_id, title, tag, content, time) \
              VALUES (?, ?, ?, ?, ?, ?)"
-    cursor.execute(query, (user_id, classroom_id, question["title"],
-                           question["tag"] if "tag" in question else "Default", 
-                           question["content"], question["askTime"]))
+    
+    try:
+        cursor.execute(query, (user_id, classroom_id, question["title"],
+                        question["tag"] if "tag" in question else "Default", 
+                        question["content"], question["askTime"]))
+    except sqlite3.IntegrityError as err:
+        conn.rollback()
+        conn.close()
+        raise err
 
     conn.commit()
     conn.close()
@@ -443,15 +462,24 @@ def get_reply_list(comment_id):
 
 def insert_comment(comment, user_id, question_id):
     """
-    将comment插入，返回comment_id
+    将comment插入,返回comment_id
     """
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
     query = "INSERT INTO comments (user_id, question_id, content, time) \
              VALUES (?, ?, ?, ?)"
-    cursor.execute(query, (user_id, question_id, comment["content"], 
-                           comment["time"] if "time" in comment else "Unknown"))
+    
+
+    try:
+        cursor.execute(query, (user_id, question_id, comment["content"], 
+                        comment["time"] if "time" in comment else "Unknown"))
+    except sqlite3.IntegrityError as err:
+        conn.rollback()
+        conn.close()
+        raise err
+    
+
     
     comment_id = cursor.lastrowid
 
@@ -471,7 +499,14 @@ def insert_reply(reply, user_id, comment_id):
 
     query = "INSERT INTO replies (user_id, comment_id, content, time, reply_to_username) \
              VALUES (?, ?, ?, ?, ?)"
-    cursor.execute(query, (user_id, comment_id, reply["content"], reply["replyTime"], reply["toUserNickName"]))
+    
+    try:
+        cursor.execute(query, (user_id, comment_id, reply["content"], \
+                               reply["replyTime"], reply["toUserNickName"]))
+    except sqlite3.IntegrityError as err:
+        conn.rollback()
+        conn.close()
+        raise err
 
     conn.commit()
     conn.close()
@@ -508,6 +543,8 @@ def delete_question(question_id):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
 
+    # delete corresponding comment and replies
+
     query = "DELETE FROM questions WHERE id = ?"
     cursor.execute(query, (question_id,))
 
@@ -523,11 +560,16 @@ def edit_question(editted_question, question_id):
     cursor = conn.cursor()
 
     query = "UPDATE questions SET title = ?, content = ? WHERE id = ?"
-    cursor.execute(query, (editted_question["title"], editted_question["content"], question_id))
+
+    try:
+        cursor.execute(query, (editted_question["title"], editted_question["content"], question_id))
+    except sqlite3.IntegrityError as err:
+        conn.rollback()
+        conn.close()
+        raise err
 
     conn.commit()
     conn.close()
-
 
 
 if __name__ == "__main__":
