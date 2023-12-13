@@ -487,7 +487,8 @@ def get_my_question_list(id):
     # 获取questions的id, title和content
     query = "SELECT id, title, content \
             FROM questions \
-            WHERE user_id = ?"
+            WHERE user_id = ? \
+            ORDER BY time DESC"
 
     cursor.execute(query, (id,))
 
