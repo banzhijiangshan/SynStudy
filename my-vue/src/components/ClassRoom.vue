@@ -96,8 +96,8 @@ export default {
   position: absolute;
   top: 40.5%;
   left: 58%;
-  width: 155px;
-  height: 64px;
+  width: 10.4%;
+  height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
   border: 3px solid transparent;
@@ -112,8 +112,8 @@ export default {
   position: absolute;
   top: 40.5%;
   left: 68.2%;
-  width: 155px;
-  height: 64px;
+  width: 10.4%;
+  height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
   border: 3px solid transparent;
@@ -127,9 +127,9 @@ export default {
 .enter-button2 {
   position: absolute;
   top: 58.86%;
-  left: 40.6%;
-  width: 155px;
-  height: 64px;
+  left: 40.5%;
+  width: 10.4%;
+  height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
   border: 3px solid transparent;
@@ -143,9 +143,9 @@ export default {
 .enter-button3 {
   position: absolute;
   top: 77.2%;
-  left: 29.55%;
-  width: 155px;
-  height: 64px;
+  left: 29.45%;
+  width: 10.4%;
+  height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
   border: 3px solid transparent;
@@ -159,9 +159,9 @@ export default {
 .enter-button4 {
   position: absolute;
   top: 77.2%;
-  left: 68.2%;
-  width: 155px;
-  height: 64px;
+  left: 68.1%;
+  width: 10.4%;
+  height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
   border: 3px solid transparent;

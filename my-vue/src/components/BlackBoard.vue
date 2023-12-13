@@ -1115,7 +1115,7 @@ export default {
   -webkit-box-orient: vertical;
   font-family: Helvetica;
   font-size: 16px;
-  margin-right: 180px;
+  margin-right: 170px;
 }
 
 .inputComment {
