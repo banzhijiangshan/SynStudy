@@ -6,6 +6,7 @@
       width="70%"
       :height="400"
       :before-close="handleClose"
+      :close-on-press-escape="false"
       :show-close="false"
       class="board-dialog"
     >
@@ -33,6 +34,7 @@
               class="titleInput"
               maxlength="20"
               show-word-limit
+              @keydown.enter.prevent
             ></el-input>
           </el-form-item>
           <el-form-item label="内容:">
@@ -43,6 +45,7 @@
               :rows="8"
               maxlength="200"
               show-word-limit
+              @keydown.enter.prevent
             ></el-input>
           </el-form-item>
           <el-form-item>
@@ -117,6 +120,7 @@
                       v-model="currentEditTitle"
                       maxlength="20"
                       show-word-limit
+                      @keydown.enter.prevent
                     ></el-input>
                   </el-form-item>
                   <el-form-item label="内容:">
@@ -127,6 +131,7 @@
                       maxlength="200"
                       show-word-limit
                       class="custom-textarea"
+                      @keydown.enter.prevent
                     >
                     </el-input>
                   </el-form-item>
@@ -155,7 +160,7 @@
       <ul
         class="list"
         v-infinite-scroll="load"
-        style="overflow: hidden auto !important"
+        style="overflow: auto"
         infinite-scroll-immediate="false"
         v-loading="loading"
       >
@@ -193,10 +198,12 @@
             <div class="list-main-text">
               <p>简述：{{ item.titleContent }}</p>
             </div>
+            <div style="flex-grow: 1"></div>
             <el-button
               type="info"
               class="info-button"
               @click="toComment(item.id)"
+              style="margin-right: 59px"
             >
               查看详情
             </el-button>
@@ -462,6 +469,7 @@ export default {
   name: "BlackBoard",
   data() {
     return {
+      firstLoad: true,
       currentQuestionId: "",
       dialogVisible: false,
       allQuestions: [],
@@ -509,7 +517,10 @@ export default {
 
   methods: {
     open() {
-      this.load();
+      if (this.firstLoad) {
+        this.load();
+      }
+      this.firstLoad = false;
       this.dialogVisible = true;
     },
     handleClose() {
@@ -936,10 +947,16 @@ export default {
   height: 50px;
   transform: translate(-50%, -50%);
   border: none;
+  outline: none;
   background-color: transparent;
 }
 .new-button:hover {
   background-color: transparent;
+  border: none;
+}
+.new-button:focus {
+  background-color: transparent;
+  border: none;
 }
 
 .my-button {
@@ -950,10 +967,16 @@ export default {
   height: 50px;
   transform: translate(-50%, -50%);
   border: none;
+  outline: none;
   background-color: transparent;
 }
 .my-button:hover {
   background-color: transparent;
+  border: none;
+}
+.my-button:focus {
+  background-color: transparent;
+  border: none;
 }
 
 .titleInput {
@@ -1092,6 +1115,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   margin-top: 0.8%;
   margin-left: 1.5%;
@@ -1109,13 +1133,18 @@ export default {
   float: left;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 400px;
+  width: 200px;
   display: -webkit-box;
   -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
   font-family: Helvetica;
   font-size: 16px;
-  margin-right: 170px;
+}
+
+.info-button {
+  border-radius: 10px;
+  border: none;
+  color: white;
 }
 
 .inputComment {
@@ -1342,12 +1371,6 @@ export default {
   float: right;
   cursor: pointer;
   height: 22px;
-}
-
-.info-button {
-  border-radius: 10px;
-  border: none;
-  color: white;
 }
 
 .reply-button {
