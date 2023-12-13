@@ -142,7 +142,7 @@ export default {
         })
         .then((res) => {
           if (res.data.valid === 0) {
-            this.$router.push("/login");
+            this.$router.push("/");
             ElMessage({
               message: "登录已失效",
               type: "error",
