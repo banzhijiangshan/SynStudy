@@ -107,6 +107,10 @@ def get_user_info():
     # user_info['image'] = 'http://localhost:5001/' + user_info['image']
     user_info['image'] = image_url
     # print(user_info['image'])
+
+    # debug
+    print("app.get_user_info returns: ", user_info)
+
     if user_info is None:
         return jsonify(code=401, message="id error")
     else:
@@ -301,44 +305,45 @@ def get_question_content():
     return_data['askTime'] = question_content[3]
     return_data['content'] = question_content[2]
     return_data['comments'] = []
-    if comment_list is None:
-        return jsonify(code=200, message="comment is empty!", question=return_data)
-
-    for comment in comment_list:
-        processed_comment = {}
-        processed_comment['commenterUrl'] = url_for(
-                'static', filename=comment[0] if comment[0] else "user_pics/default.jpg")
-        # if comment[0] is None:
-        #     processed_comment['commenterUrl'] = None
-        # else:
-        #     processed_comment['commenterUrl'] = url_for(
-        #         'static', filename=comment[0])
-        processed_comment['userName'] = comment[1]
-        processed_comment['commentTime'] = comment[3]
-        processed_comment['content'] = comment[2]
-        processed_comment['commentId'] = comment[4]
-        processed_comment['replies'] = []
-        processed_comment['replyContent'] = None
-        processed_comment['canInputReply'] = 200
-        reply_list = database.get_reply_list(comment[4])
-        if reply_list is not None:
-            for reply in reply_list:
-                processed_reply = {}
-                processed_reply['fromUserAvatarUrl'] = url_for(
-                        'static', filename=reply[0] if reply[0] else "user_pics/default.jpg")
-                # if reply[0] is None:
-                #     processed_reply['fromUserAvatarUrl'] = None
-                # else:
-                #     processed_reply['fromUserAvatarUrl'] = url_for(
-                #         'static', filename=reply[0])
-                processed_reply['fromUserNickName'] = reply[1]
-                processed_reply['toUserNickName'] = reply[2]
-                processed_reply['replyTime'] = reply[4]
-                processed_reply['content'] = reply[3]
-                processed_reply['replyContent'] = None
-                processed_reply['canInputReply'] = 200
-                processed_comment['replies'].append(processed_reply)
-        return_data['comments'].append(processed_comment)
+    if comment_list is not None:
+        for comment in comment_list:
+            processed_comment = {}
+            processed_comment['commenterUrl'] = url_for(
+                    'static', filename=comment[0] if comment[0] else "user_pics/default.jpg")
+            # if comment[0] is None:
+            #     processed_comment['commenterUrl'] = None
+            # else:
+            #     processed_comment['commenterUrl'] = url_for(
+            #         'static', filename=comment[0])
+            processed_comment['userName'] = comment[1]
+            processed_comment['commentTime'] = comment[3]
+            processed_comment['content'] = comment[2]
+            processed_comment['commentId'] = comment[4]
+            processed_comment['replies'] = []
+            processed_comment['replyContent'] = None
+            processed_comment['canInputReply'] = 200
+            reply_list = database.get_reply_list(comment[4])
+            if reply_list is not None:
+                for reply in reply_list:
+                    processed_reply = {}
+                    processed_reply['fromUserAvatarUrl'] = url_for(
+                            'static', filename=reply[0] if reply[0] else "user_pics/default.jpg")
+                    # if reply[0] is None:
+                    #     processed_reply['fromUserAvatarUrl'] = None
+                    # else:
+                    #     processed_reply['fromUserAvatarUrl'] = url_for(
+                    #         'static', filename=reply[0])
+                    processed_reply['fromUserNickName'] = reply[1]
+                    processed_reply['toUserNickName'] = reply[2]
+                    processed_reply['replyTime'] = reply[4]
+                    processed_reply['content'] = reply[3]
+                    processed_reply['replyContent'] = None
+                    processed_reply['canInputReply'] = 200
+                    processed_comment['replies'].append(processed_reply)
+            return_data['comments'].append(processed_comment)
+    
+    # debug
+    print("app.get_question_content returns: ", return_data)
 
     return jsonify(code=200,
                     message="Get question successful",
@@ -436,6 +441,57 @@ def get_newest_question():
                        message="Get question successful",
                        question=processed_question_list[0])
 
+
+@app.route('/getMyQuestions', methods=['GET',])
+def get_my_questions():
+    id = session.get('user_id')
+    question_list = database.get_my_question_list(id)
+
+    if question_list is None:
+        return jsonify(code=200, message="no question!", questions=[])
+
+    # question_list: id, title, content
+    # processed_question_list: id, titleContent, content
+    processed_question_list = []
+    for question in question_list:
+        processed_question = {}
+        processed_question['id'] = question[0]
+        processed_question['titleContent'] = question[1]
+        processed_question['content'] = question[2]
+        processed_question_list.append(processed_question)
+
+    return jsonify(code=200,
+                       message="Get question successful",
+                       questions=processed_question_list)
+
+
+@app.route('/deleteQuestion', methods=['POST',])
+def delete_question():
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    question_id = processed_data['questionId']
+    # user_id = session.get('user_id')
+    try:
+        database.delete_question(question_id)
+    except sqlite3.IntegrityError:
+        return jsonify(code=409, message="Delete question failed!")
+    
+    return jsonify(code=200, message="Delete question successful")
+
+
+@app.route('/editQuestion', methods=['POST',])
+def edit_question():
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    question_id = processed_data['questionId']
+    try:
+        database.edit_question(processed_data, question_id)
+    except sqlite3.IntegrityError:
+        return jsonify(code=409, message="Edit question failed!")
+    
+    return jsonify(code=200, message="Edit question successful")
 
 
 if __name__ == '__main__':

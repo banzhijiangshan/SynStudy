@@ -57,86 +57,97 @@
       </el-popover>
 
       <el-popover
-        ref="myRef"
+        ref="popoverRef2"
         :virtual-ref="myRef"
         trigger="click"
         title="我的问题"
-        :width="450"
+        :width="500"
         center="true"
         virtual-triggering
         placement="top"
         align="center"
         @show="getMyQuestions"
       >
-        <ul class="list">
+        <ul class="my-list" style="overflow: auto">
           <li
             v-for="(item, index) in myQuestions"
-            class="list-item"
+            class="my-list-item"
             :key="index"
-            :style="{ backgroundColor: getColor(index) }"
+            :style="{ backgroundColor: getMyColor(index) }"
           >
-            <div class="list-main">
+            <div class="my-list-main">
               <div class="list-main-text">
-                <p>简述：{{ item.titleContent }}</p>
+                <el-input
+                  type="textarea"
+                  :value="'简述：' + item.titleContent"
+                  readonly
+                  autosize
+                  class="styled-reply"
+                >
+                </el-input>
               </div>
-              <el-button
-                type="info"
-                class="my-info-button"
-                @click="toComment(item.id)"
-              >
-                详情
-              </el-button>
-              <el-button
-                type="primary"
-                class="edit-button"
-                @click="openEdit(item)"
-              >
-                编辑
-              </el-button>
-              <el-button
-                type="danger"
-                class="delete-button"
-                @click="deleteQuestion(index)"
-              >
-                删除
-              </el-button>
-              <div style="width: 100%"></div>
+              <div class="button-row">
+                <el-button
+                  type="info"
+                  class="my-info-button"
+                  @click="toComment(item.id)"
+                >
+                  详情
+                </el-button>
+                <el-button
+                  type="primary"
+                  class="edit-button"
+                  @click="openEdit(item)"
+                >
+                  编辑
+                </el-button>
+                <el-button
+                  type="danger"
+                  class="delete-button"
+                  @click="preDeleteQuestion(index)"
+                >
+                  删除
+                </el-button>
+              </div>
+
+              <span v-if="item.isEdit" class="editArea">
+                <el-form style="margin-left: 10px; margin-top: 8px">
+                  <el-form-item label="简述:">
+                    <el-input
+                      v-model="currentEditTitle"
+                      maxlength="20"
+                      show-word-limit
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="内容:">
+                    <el-input
+                      type="textarea"
+                      v-model="currentEditContent"
+                      autosize
+                      maxlength="200"
+                      show-word-limit
+                      class="custom-textarea"
+                    >
+                    </el-input>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button
+                      type="success"
+                      @click="submitEdit(item.id)"
+                      class="my-submit-button"
+                      >提交</el-button
+                    >
+                    <el-button
+                      type="warning"
+                      @click="closeEdit(item)"
+                      class="my-exit-button"
+                      >退出</el-button
+                    >
+                  </el-form-item>
+                </el-form>
+              </span>
+              <div style="height: 10px"></div>
             </div>
-            <span v-if="item.isEdit" class="editArea">
-              <el-form>
-                <el-form-item label="简述:">
-                  <el-input
-                    v-model="currentEditTitle"
-                    maxlength="20"
-                    show-word-limit
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="内容:">
-                  <el-input
-                    type="textarea"
-                    v-model="currentEditContent"
-                    autosize
-                    maxlength="200"
-                    show-word-limit
-                  >
-                  </el-input>
-                </el-form-item>
-                <el-form-item>
-                  <el-button
-                    type="primary"
-                    @click="submitEdit(item.id)"
-                    class="submit-button"
-                    >提交</el-button
-                  >
-                  <el-button
-                    type="warning"
-                    @click="closeEdit(item)"
-                    class="submit-button"
-                    >退出</el-button
-                  >
-                </el-form-item>
-              </el-form>
-            </span>
           </li>
         </ul>
       </el-popover>
@@ -421,7 +432,7 @@
 
 <script>
 import instance from "@/axios";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { ref } from "vue";
 
 /*评论结构参考：
@@ -481,12 +492,14 @@ export default {
     const buttonRef = ref(null);
     const popoverRef = ref(null);
     const myRef = ref(null);
+    const popoverRef2 = ref(null);
     const drawer = ref(false);
 
     return {
       buttonRef,
       popoverRef,
       myRef,
+      popoverRef2,
       drawer,
     };
   },
@@ -508,6 +521,11 @@ export default {
     },
     getColor(index) {
       const colors = ["#FFC0CB", "#ADD8E6", "#CFFECF", "#FDF9D4", "#D4D4D4"];
+      const colorIndex = index % colors.length;
+      return colors[colorIndex];
+    },
+    getMyColor(index) {
+      const colors = ["#FFE9E9", "#F6F0FF", "#F0F5FF"];
       const colorIndex = index % colors.length;
       return colors[colorIndex];
     },
@@ -780,11 +798,13 @@ export default {
     },
     openEdit(item) {
       item.isEdit = true;
+      this.currentEditTitle = item.titleContent;
       this.currentEditContent = item.content;
     },
     closeEdit(item) {
-      item.isEdit = false;
+      this.currentEditTitle = "";
       this.currentEditContent = "";
+      item.isEdit = false;
     },
     getMyQuestions() {
       instance.get("/getMyQuestions").then((res) => {
@@ -802,6 +822,26 @@ export default {
         }
       });
     },
+    preDeleteQuestion(index) {
+      ElMessageBox.confirm("确定要删除这个问题吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.deleteQuestion(index);
+          ElMessage({
+            type: "success",
+            message: "删除成功",
+          });
+        })
+        .catch(() => {
+          ElMessage({
+            type: "info",
+            message: "操作取消",
+          });
+        });
+    },
     deleteQuestion(index) {
       instance
         .post("/deleteQuestion", {
@@ -817,10 +857,6 @@ export default {
               }
             }
             this.myQuestions.splice(index, 1);
-            ElMessage({
-              message: "删除成功",
-              type: "success",
-            });
           } else {
             ElMessage({
               message: "删除失败",
@@ -906,6 +942,20 @@ export default {
   background-color: transparent;
 }
 
+.my-button {
+  position: absolute;
+  top: 89.8%;
+  left: 91%;
+  width: 65px;
+  height: 50px;
+  transform: translate(-50%, -50%);
+  border: none;
+  background-color: transparent;
+}
+.my-button:hover {
+  background-color: transparent;
+}
+
 .titleInput {
   width: 300px;
 }
@@ -913,6 +963,8 @@ export default {
   width: 300px;
   height: 200px;
   line-height: 200px !important;
+  font-family: Helvetica;
+  font-size: 14px;
 }
 
 .submit-button {
@@ -990,6 +1042,15 @@ export default {
   height: 63%;
 }
 
+.my-list {
+  position: relative;
+  margin-top: 2%;
+  margin-left: 6%;
+  list-style-type: none;
+  width: 100%;
+  height: 400px;
+}
+
 .list-item {
   color: #000000;
   border-radius: 10px;
@@ -997,6 +1058,15 @@ export default {
   float: left;
   width: 90%;
   margin-top: 1.5%;
+}
+
+.my-list-item {
+  color: #000000;
+  border-radius: 8px;
+  padding: 5px;
+  float: left;
+  width: 90%;
+  margin-top: 2.5%;
 }
 
 .list-top img {
@@ -1025,6 +1095,13 @@ export default {
   width: 100%;
   margin-top: 0.8%;
   margin-left: 1.5%;
+}
+
+.my-list-main {
+  float: left;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .list-main-text {
@@ -1284,6 +1361,7 @@ export default {
   border: none !important;
   box-shadow: none !important;
   resize: none !important;
+  background-color: transparent !important;
 }
 
 .my-info-button {
@@ -1302,5 +1380,37 @@ export default {
   border-radius: 10px;
   border: none;
   color: white;
+}
+
+.editArea {
+  margin-top: 6px;
+}
+
+.my-submit-button {
+  position: absolute;
+  margin-top: 15px;
+  left: 29%;
+  width: 57px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+}
+.my-exit-button {
+  position: absolute;
+  margin-top: 15px;
+  left: 59%;
+  width: 57px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+}
+
+.button-row {
+  margin-left: 9px;
+}
+
+.custom-textarea {
+  font-family: Helvetica;
+  font-size: 14px;
 }
 </style>
