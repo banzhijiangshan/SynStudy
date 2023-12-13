@@ -1,5 +1,6 @@
 import os
 import time
+import threading
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -20,7 +21,7 @@ app = Flask(__name__)
 app.secret_key = 'a_random_key'
 
 # session lifetime should be shorter than 2*heartbeat_interval?
-# 否则有可能client已删除，但session未过期，导致页面不会跳转到登录界面
+# 否则有可能client已删除，但session未过期，导致用户不会退出登录，但人数已经减少
 app.config['PERMANENT_SESSION_LIFETIME'] = 6   # need to consider again, this is usually too short
 
 bcrypt = Bcrypt(app)
@@ -31,15 +32,24 @@ max_cur_client_id = 0
 
 @app.route('/heartbeat', methods=['POST',])
 def receive_heartbeat():
+
     raw_data = request.get_data()
     print(raw_data)
     processed_data = utils.process_data(raw_data)
+    session['last_accessed'] = time.time()
     client_id = session.get('client_id')
-    valid = False
+    valid = 0
     if client_id:
         clients[client_id].receive_heartbeat()
-        valid = True
+        valid = 1
+        
+    #debug
+    print("app.receive_heartbeat returns: ", valid)
+
     return jsonify(code=200, message="Heartbeat received", valid=valid)
+    # return jsonify(code=200, message="Heartbeat received", valid=True)
+
+
 
 
 @app.route('/register', methods=['POST',])
@@ -78,8 +88,10 @@ def login():
         return jsonify(code=401, message="Incorrect password!")
     else:
         session.clear() # reinitialize session in case the last session doesn't expire yet
+        session.permanent = True
         session['user_id'] = int(id)
         # construct a new client
+        global max_cur_client_id
         session['client_id'] = max_cur_client_id + 1
         max_cur_client_id += 1
         clients[session['client_id']] = Client(session['client_id'], session['user_id'])
@@ -195,6 +207,9 @@ def enter_classroom():
     classroom_id = database.get_classroom_id(subject)
     # set session classroom_id
     session['classroom_id'] = classroom_id
+    # set client classroom_id
+    client_id = session.get('client_id')
+    clients[client_id].enter_classroom(classroom_id)
     if classroom_id is None:
         return jsonify(code=401, message="Classroom not exists!")
     else:
@@ -517,12 +532,16 @@ def edit_question():
     return jsonify(code=200, message="Edit question successful")
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='5001')
-    # periodically check if clients are still alive
+def periodic_check():
     while True:
-        for client in clients:
+        for client in list(clients):
             if not clients[client].valid:
                 del clients[client]
-
         time.sleep(3)
+
+
+if __name__ == '__main__':
+    check_thread = threading.Thread(target=periodic_check)
+    check_thread.start()
+    app.run(host='0.0.0.0', port='5001')
+    # periodically check if clients are still alive

@@ -280,6 +280,9 @@ def leave_classroom(id, classroom_id):
         conn.close()
         raise err
 
+    # debug
+    print("leave_classroom called! id, classroom_id:", id, classroom_id)
+
     conn.commit()
     conn.close()
 

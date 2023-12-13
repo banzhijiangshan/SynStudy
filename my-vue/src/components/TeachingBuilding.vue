@@ -104,7 +104,7 @@ export default {
           if (res.data.valid === 0) {
             this.$router.push("/");
             ElMessage({
-              message: "登录已失效",
+              message: "登录已失效" + res.data.valid,
               type: "error",
             });
           }
