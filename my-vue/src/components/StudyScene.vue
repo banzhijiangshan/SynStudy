@@ -80,6 +80,7 @@ import InfoDia from "./MoreInfo.vue";
 import ClockCounter from "./ClockCounter.vue";
 import BlackBoard from "./BlackBoard.vue";
 import instance from "@/axios";
+import { ElMessage } from "element-plus";
 
 export default {
   components: {
