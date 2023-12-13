@@ -111,8 +111,12 @@ export default {
     };
   },
   mounted() {
-    this.freshData();
-    this.timer = setInterval(this.freshData, 5000);
+    instance.post("/peopleIncrease").then((res) => {
+      if (res.data.code === 200) {
+        this.freshData();
+        this.timer = setInterval(this.freshData, 5000);
+      }
+    });
   },
   methods: {
     //添加todo
@@ -183,6 +187,7 @@ export default {
     },
   },
   beforeUnmount() {
+    instance.post("/peopleDecrease");
     clearInterval(this.timer);
   },
 };

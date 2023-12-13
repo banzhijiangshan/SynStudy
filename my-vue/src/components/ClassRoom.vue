@@ -68,7 +68,7 @@ export default {
     });
   },
   beforeUnmount() {
-    instance.post("/exitClassRoom");
+    instance.post("/peopleDecrease");
   },
   methods: {
     study() {
