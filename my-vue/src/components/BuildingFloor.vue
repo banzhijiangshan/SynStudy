@@ -67,9 +67,11 @@ export default {
   data() {
     return {
       isDay: true,
+      timer: null,
     };
   },
   mounted() {
+    this.timer = setInterval(this.heartBeat, 3000);
     const currentTime = new Date().getHours();
     if (currentTime >= 6 && currentTime < 18) {
       this.isDay = true;
@@ -132,6 +134,14 @@ export default {
     goon() {
       this.$router.push("/second");
     },
+    heartBeat() {
+      instance.post("/heartBeat", {
+        messsage: "I am alive!",
+      });
+    },
+  },
+  beforeUnmount() {
+    clearInterval(this.timer);
   },
 };
 </script>

@@ -54,6 +54,7 @@ export default {
       hour: 0,
       min: 0,
       studytogether: 0,
+      timer: null,
     };
   },
   mounted() {
@@ -62,6 +63,7 @@ export default {
       this.min = res.data.studyInfo.minute;
       this.studytogether = res.data.studyInfo.studytogether;
     });
+    this.timer = setInterval(this.heartBeat, 3000);
   },
   methods: {
     study() {
@@ -80,6 +82,14 @@ export default {
     showInfoDia() {
       this.$refs.infoRef2.open();
     },
+    heartBeat() {
+      instance.post("/heartBeat", {
+        messsage: "I am alive!",
+      });
+    },
+  },
+  beforeUnmount() {
+    clearInterval(this.timer);
   },
 };
 </script>

@@ -112,7 +112,7 @@ export default {
   },
   mounted() {
     this.freshData();
-    this.timer = setInterval(this.freshData, 5000);
+    this.timer = setInterval(this.freshData, 3000);
   },
   methods: {
     //添加todo
@@ -169,6 +169,9 @@ export default {
     freshData() {
       instance.get("/getStudyInfo").then((res) => {
         this.studytogether = res.data.studyInfo.studytogether;
+      });
+      instance.post("/heartBeat", {
+        message: "I'm alive!",
       });
     },
     showSceneDialog() {
