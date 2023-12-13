@@ -168,9 +168,6 @@ export default {
       this.$refs.infoRef2.open();
     },
     freshData() {
-      instance.get("/getStudyInfo").then((res) => {
-        this.studytogether = res.data.studyInfo.studytogether;
-      });
       instance
         .post("/heartbeat", {
           message: "I'm alive!",
@@ -181,6 +178,10 @@ export default {
             ElMessage({
               message: "登录已失效",
               type: "error",
+            });
+          } else {
+            instance.get("/getStudyInfo").then((res) => {
+              this.studytogether = res.data.studyInfo.studytogether;
             });
           }
         });
@@ -197,7 +198,6 @@ export default {
     },
   },
   beforeUnmount() {
-    instance.post("/peopleDecrease");
     clearInterval(this.timer);
   },
 };

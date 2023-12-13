@@ -59,11 +59,25 @@ export default {
     };
   },
   mounted() {
-    instance.get("/getStudyInfo").then((res) => {
-      this.hour = res.data.studyInfo.hour;
-      this.min = res.data.studyInfo.minute;
-      this.studytogether = res.data.studyInfo.studytogether;
-    });
+    instance
+      .post("/heartbeat", {
+        messsage: "I am alive!",
+      })
+      .then((res) => {
+        if (res.data.valid === 0) {
+          this.$router.push("/login");
+          ElMessage({
+            message: "登录已失效",
+            type: "error",
+          });
+        } else {
+          instance.get("/getStudyInfo").then((res) => {
+            this.hour = res.data.studyInfo.hour;
+            this.min = res.data.studyInfo.minute;
+            this.studytogether = res.data.studyInfo.studytogether;
+          });
+        }
+      });
     this.timer = setInterval(this.heartBeat, 3000);
   },
   methods: {
