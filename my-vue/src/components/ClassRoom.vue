@@ -57,22 +57,25 @@ export default {
     };
   },
   mounted() {
-    instance.get("/getStudyInfo").then((res) => {
-      this.hour = res.data.studyInfo.hour;
-      this.min = res.data.studyInfo.minute;
-      this.studytogether = res.data.studyInfo.studytogether;
+    instance.post("/peopleIncrease").then((res) => {
+      if (res.data.code === 200) {
+        instance.get("/getStudyInfo").then((res) => {
+          this.hour = res.data.studyInfo.hour;
+          this.min = res.data.studyInfo.minute;
+          this.studytogether = res.data.studyInfo.studytogether;
+        });
+      }
     });
+  },
+  beforeUnmount() {
+    instance.post("/exitClassRoom");
   },
   methods: {
     study() {
       this.$router.push("/study");
     },
     exit() {
-      instance.post("/exitClassRoom").then((res) => {
-        if (res.data.code === 200) {
-          this.$router.push("/floor");
-        }
-      });
+      this.$router.push("/floor");
     },
     showPersonalDialog() {
       this.$refs.infoRef1.open();

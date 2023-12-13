@@ -255,10 +255,10 @@ export default {
 
 .titlenum {
   position: absolute;
-  top: 17.9%;
+  top: 17.8%;
   left: 41.55%;
   transform: translate(-50%, -50%);
-  font-size: 39px;
+  font-size: 47px;
   color: #ffffff;
   font-family: Helvetica;
 }
