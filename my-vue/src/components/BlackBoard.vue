@@ -505,11 +505,11 @@ export default {
   },
   mounted() {
     this.dialogVisible = false;
-    this.load();
   },
 
   methods: {
     open() {
+      this.load();
       this.dialogVisible = true;
     },
     handleClose() {
