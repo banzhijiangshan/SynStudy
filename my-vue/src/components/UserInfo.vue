@@ -126,11 +126,11 @@ export default {
     };
   },
   mounted() {
-    this.load();
     this.dialogVisible = false;
   },
   methods: {
     open() {
+      this.load();
       this.dialogVisible = true;
     },
     load() {
