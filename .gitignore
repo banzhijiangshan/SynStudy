@@ -7,3 +7,4 @@
 /server/user_data.db
 /server/__pycache__/
 /server/static/
+/server/tmp.ipynb

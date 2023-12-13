@@ -1,4 +1,5 @@
 import os
+import time
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -9,21 +10,36 @@ from werkzeug.utils import secure_filename
 import json
 import sqlite3
 
+
 import utils
 import database
+from client import Client
 
 
 app = Flask(__name__)
 app.secret_key = 'a_random_key'
 
-CORS(app)
+# session lifetime should be shorter than 2*heartbeat_interval?
+# 否则有可能client已删除，但session未过期，导致页面不会跳转到登录界面
+app.config['PERMANENT_SESSION_LIFETIME'] = 6   # need to consider again, this is usually too short
 
 bcrypt = Bcrypt(app)
 
+clients = {}
+max_cur_client_id = 0
 
-@app.route('/')
-def index():
-    pass
+
+@app.route('/heartbeat', methods=['POST',])
+def receive_heartbeat():
+    raw_data = request.get_data()
+    print(raw_data)
+    processed_data = utils.process_data(raw_data)
+    client_id = session.get('client_id')
+    valid = False
+    if client_id:
+        clients[client_id].receive_heartbeat()
+        valid = True
+    return jsonify(code=200, message="Heartbeat received", valid=valid)
 
 
 @app.route('/register', methods=['POST',])
@@ -48,7 +64,6 @@ def register():
     return jsonify(code=200, message="Register successful")
 
 
-
 @app.route('/login', methods=['POST',])
 def login():
     raw_data = request.get_data()
@@ -62,17 +77,19 @@ def login():
     elif not bcrypt.check_password_hash(correct_pwd, password):
         return jsonify(code=401, message="Incorrect password!")
     else:
+        session.clear() # reinitialize session in case the last session doesn't expire yet
         session['user_id'] = int(id)
+        # construct a new client
+        session['client_id'] = max_cur_client_id + 1
+        max_cur_client_id += 1
+        clients[session['client_id']] = Client(session['client_id'], session['user_id'])
         return jsonify(code=200, message="Login successful")
-
 
 
 @app.route('/logout', methods=['POST',])
 def logout():
     session.pop('user_id', None)
     return jsonify(code=200, message="Logout successful")
-
-
 
 
 @app.route('/generateStudentId', methods=['GET',])
@@ -502,3 +519,10 @@ def edit_question():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5001')
+    # periodically check if clients are still alive
+    while True:
+        for client in clients:
+            if not clients[client].valid:
+                del clients[client]
+
+        time.sleep(3)
