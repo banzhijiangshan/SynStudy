@@ -106,6 +106,9 @@ def insert_register_data(data):
     password = data["password"]
     email = data["email"]
 
+    # begin transaction
+    c.execute("BEGIN TRANSACTION")
+
     try:
         c.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
                 (username, password, email))
@@ -113,9 +116,13 @@ def insert_register_data(data):
         conn.rollback()
         conn.close()
         raise err
+    
+    id = c.lastrowid
 
     conn.commit()
     conn.close()
+
+    return id
 
 
 
@@ -476,7 +483,8 @@ def insert_comment(comment, user_id, question_id):
     query = "INSERT INTO comments (user_id, question_id, content, time) \
              VALUES (?, ?, ?, ?)"
     
-
+    # begin transaction
+    cursor.execute("BEGIN TRANSACTION")
     try:
         cursor.execute(query, (user_id, question_id, comment["content"], 
                         comment["time"] if "time" in comment else "Unknown"))
@@ -484,8 +492,6 @@ def insert_comment(comment, user_id, question_id):
         conn.rollback()
         conn.close()
         raise err
-    
-
     
     comment_id = cursor.lastrowid
 

@@ -54,7 +54,7 @@ def register():
     processed_data['password'] = bcrypt.generate_password_hash(
         processed_data['password'])
     try:
-        database.insert_register_data(processed_data)
+        user_id = database.insert_register_data(processed_data)
     except sqlite3.IntegrityError as err:
         if "users.email" in str(err).split():
             message = "Email already exists!"
@@ -64,7 +64,7 @@ def register():
             message = str(err)
         return jsonify(code=409, message=message)
 
-    return jsonify(code=200, message="Register successful")
+    return jsonify(code=200, message="Register successful", id = user_id + 10000)
 
 
 @app.route('/login', methods=['POST',])
