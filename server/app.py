@@ -32,10 +32,6 @@ max_cur_client_id = 0
 
 @app.route('/heartbeat', methods=['POST',])
 def receive_heartbeat():
-
-    raw_data = request.get_data()
-    print(raw_data)
-    processed_data = utils.process_data(raw_data)
     session['last_accessed'] = time.time()
     client_id = session.get('client_id')
     valid = 0
@@ -47,9 +43,6 @@ def receive_heartbeat():
     print("app.receive_heartbeat returns: ", valid)
 
     return jsonify(code=200, message="Heartbeat received", valid=valid)
-    # return jsonify(code=200, message="Heartbeat received", valid=True)
-
-
 
 
 @app.route('/register', methods=['POST',])
@@ -209,7 +202,7 @@ def enter_classroom():
     session['classroom_id'] = classroom_id
     # set client classroom_id
     client_id = session.get('client_id')
-    clients[client_id].enter_classroom(classroom_id)
+    clients[client_id].set_classroom(classroom_id)
     if classroom_id is None:
         return jsonify(code=401, message="Classroom not exists!")
     else:
@@ -228,6 +221,9 @@ def leave_classroom():
     classroom_id = session.get('classroom_id')
     # pop session classroom_id
     session.pop('classroom_id', None)
+    # pop client classroom_id
+    client_id = session.get('client_id')
+    clients[client_id].set_classroom(None)
     if classroom_id is None:
         return jsonify(code=401, message="Classroom not set!")
     else:

@@ -136,14 +136,15 @@ export default {
     load() {
       instance.get("/getUserInfo").then((res) => {
         this.imageUrl = res.data.userInfo.image;
-        //this.form.password = res.data.userInfo.password;
+        // this.form.password = res.data.userInfo.password;
         this.form.username = res.data.userInfo.username;
         this.form.age = res.data.userInfo.age;
-        if (res.data.userInfo.sex === 0) {
-          this.form.sex = false;
-        } else if (res.data.userInfo.sex === 1) {
-          this.form.sex = true;
-        }
+        // if (res.data.userInfo.sex === 0) {
+        //   this.form.sex = false;
+        // } else if (res.data.userInfo.sex === 1) {
+        //   this.form.sex = true;
+        // }
+        this.form.sex = res.data.userInfo.sex;
         this.form.email = res.data.userInfo.email;
         this.form.id = res.data.userInfo.id;
         this.form.area = res.data.userInfo.area;
