@@ -69,6 +69,19 @@ export default {
     };
   },
   mounted() {
+    instance
+      .post("/heartbeat", {
+        messsage: "I am alive!",
+      })
+      .then((res) => {
+        if (res.data.valid === 0) {
+          this.$router.push("/");
+          ElMessage({
+            message: "登录已失效",
+            type: "error",
+          });
+        }
+      });
     this.timer = setInterval(this.heartBeat, 3000);
     const currentTime = new Date().getHours();
     if (currentTime >= 6 && currentTime < 18) {

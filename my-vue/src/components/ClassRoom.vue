@@ -130,81 +130,86 @@ export default {
 .enter-button {
   position: absolute;
   top: 40.5%;
-  left: 58%;
+  left: 57.98%;
   width: 10.4%;
   height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
-  border: 3px solid transparent;
+  border: 4px solid transparent;
   transition: border 0.3s;
 }
 .enter-button:hover {
   background-color: transparent;
   border-color: white;
+  border-radius: 6px;
 }
 
 .enter-button1 {
   position: absolute;
   top: 40.5%;
-  left: 68.2%;
+  left: 68.26%;
   width: 10.4%;
   height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
-  border: 3px solid transparent;
+  border: 4px solid transparent;
   transition: border 0.3s;
 }
 .enter-button1:hover {
   background-color: transparent;
   border-color: white;
+  border-radius: 6px;
 }
 
 .enter-button2 {
   position: absolute;
   top: 58.86%;
-  left: 40.5%;
+  left: 40.72%;
   width: 10.4%;
   height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
-  border: 3px solid transparent;
+  border: 4px solid transparent;
   transition: border 0.3s;
 }
 .enter-button2:hover {
   background-color: transparent;
   border-color: white;
+  border-radius: 6px;
 }
 
 .enter-button3 {
   position: absolute;
   top: 77.2%;
-  left: 29.45%;
+  left: 29.68%;
   width: 10.4%;
   height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
-  border: 3px solid transparent;
+  border: 4px solid transparent;
   transition: border 0.3s;
 }
 .enter-button3:hover {
   background-color: transparent;
   border-color: white;
+  border-radius: 6px;
 }
 
 .enter-button4 {
   position: absolute;
   top: 77.2%;
-  left: 68.1%;
+  left: 68.33%;
   width: 10.4%;
   height: 7.4%;
   transform: translate(-50%, -50%);
   background-color: transparent;
-  border: 3px solid transparent;
+  border: 4px solid transparent;
   transition: border 0.3s;
 }
 .enter-button4:hover {
   background-color: transparent;
   border-color: white;
+  border-radius: 6px;
 }
 
 .back-button {

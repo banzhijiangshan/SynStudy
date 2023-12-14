@@ -37,16 +37,15 @@
           </el-icon>
         </el-button>
       </div>
-
-      <div class="right-bottom">
-        <el-button type="info" class="button-class1" @click="goback">
-          <span style="vertical-align: middle"> 退出 </span>
-          <el-icon style="vertical-align: middle">
-            <Right />
-          </el-icon>
-        </el-button>
-      </div>
     </el-row>
+    <div class="right-bottom">
+      <el-button type="info" class="button-class1" @click="goback">
+        <span style="vertical-align: middle"> 退出 </span>
+        <el-icon style="vertical-align: middle">
+          <Right />
+        </el-icon>
+      </el-button>
+    </div>
     <el-button type="primary" class="enter-button" @click="goin1"> </el-button>
     <el-button type="primary" class="enter-button1" @click="goin2"> </el-button>
     <el-button type="primary" class="enter-button2" @click="goin3"> </el-button>
@@ -72,6 +71,19 @@ export default {
     };
   },
   mounted() {
+    instance
+      .post("/heartbeat", {
+        messsage: "I am alive!",
+      })
+      .then((res) => {
+        if (res.data.valid === 0) {
+          this.$router.push("/");
+          ElMessage({
+            message: "登录已失效",
+            type: "error",
+          });
+        }
+      });
     this.timer = setInterval(this.heartBeat, 3000);
     const currentTime = new Date().getHours();
     if (currentTime >= 6 && currentTime < 18) {
@@ -182,8 +194,8 @@ export default {
 
 .right-bottom {
   position: absolute;
-  top: 800px;
-  right: 70px;
+  top: 90%;
+  right: 5%;
 }
 
 .button-class {

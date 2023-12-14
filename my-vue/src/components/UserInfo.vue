@@ -6,7 +6,13 @@
       width="57%"
       :before-close="handleClose"
     >
-      <el-form :model="form" :rules="rules" ref="form" label-width="150px">
+      <el-form
+        :model="form"
+        :rules="rules"
+        ref="form"
+        label-width="150px"
+        style="font-family: Helvetica"
+      >
         <div class="updateinfo">
           <div class="left">
             <el-form-item label="头像" prop="avatar">
@@ -41,16 +47,10 @@
               <el-input v-model="form.age"></el-input>
             </el-form-item>
             <el-form-item label="性别" prop="sex">
-              <el-switch
-                v-model="form.sex"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-                active-text="男"
-                inactive-text="女"
-                :active-value="1"
-                :inactive-value="0"
-              >
-              </el-switch>
+              <el-radio-group v-model="radio">
+                <el-radio label="1">男</el-radio>
+                <el-radio label="0">女</el-radio>
+              </el-radio-group>
             </el-form-item>
             <el-form-item label="邮箱" prop="email">
               <el-input v-model="form.email"></el-input>
@@ -77,7 +77,7 @@
             <el-form-item label="个性签名" prop="design">
               <el-input v-model="form.design" style="width: 280px"></el-input>
             </el-form-item>
-            <el-form-item label="手机号码" prop="phone">
+            <el-form-item label="联系方式" prop="phone">
               <el-input v-model="form.phone" style="width: 280px"></el-input>
             </el-form-item>
           </div>
@@ -94,6 +94,7 @@
 <script>
 import instance from "@/axios";
 import { ElMessage } from "element-plus";
+import { ref } from "vue";
 //import { Plus } from "@element-plus/icons-vue";
 
 export default {
@@ -125,6 +126,12 @@ export default {
       },
     };
   },
+  setup() {
+    const radio = ref("1");
+    return {
+      radio,
+    };
+  },
   mounted() {
     this.dialogVisible = false;
   },
@@ -136,10 +143,17 @@ export default {
     load() {
       instance.get("/getUserInfo").then((res) => {
         this.imageUrl = res.data.userInfo.image;
+        if (this.imageUrl === "/static/user_pics/default.jpg") {
+          this.imageUrl = "";
+        }
         // this.form.password = res.data.userInfo.password;
         this.form.username = res.data.userInfo.username;
         this.form.age = res.data.userInfo.age;
-        this.form.sex = res.data.userInfo.sex;
+        if (res.data.userInfo === 1) {
+          this.radio = "1";
+        } else {
+          this.radio = "0";
+        }
         this.form.email = res.data.userInfo.email;
         this.form.id = res.data.userInfo.id;
         this.form.area = res.data.userInfo.area;

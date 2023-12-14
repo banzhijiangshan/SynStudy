@@ -38,28 +38,19 @@ export default {
 -->
 
 <template>
-  <router-view style="height: 100%; width: 100%"></router-view>
+  <transition name="fade" mode="out-in">
+    <router-view style="height: 100%; width: 100%"></router-view>
+  </transition>
 </template>
 
-<!--<script>
-import IndexPage from "@/components/IndexPage.vue";
-
-export default {
-  name: "App",
-  components: {
-    IndexPage,
-  },
-};
-</script>
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
--->

@@ -11,15 +11,6 @@
         style="margin: 0; position: absolute; height: 100%; width: 100%"
       ></el-image>
 
-      <el-button type="primary" class="plan-button" @click="plan">
-        我的计划
-      </el-button>
-      <el-button type="primary" class="shift-button" @click="showSceneDialog">
-        切换场景
-      </el-button>
-      <el-button type="primary" class="board-button" @click="showBoard">
-        黑板
-      </el-button>
       <el-button type="primary" class="back-button" @click="outclass">
       </el-button>
 
@@ -46,6 +37,15 @@
       <ClockCounter class="myclk" ref="clockref"></ClockCounter>
     </el-main>
     <!-- 左上角的按钮组 -->
+    <el-button type="primary" class="plan-button" @click="plan">
+      我的计划
+    </el-button>
+    <el-button type="primary" class="shift-button" @click="showSceneDialog">
+      切换场景
+    </el-button>
+    <el-button type="primary" class="board-button" @click="showBoard">
+      黑板
+    </el-button>
     <div class="left-top">
       <el-button
         type="primary"
@@ -219,7 +219,8 @@ export default {
 .plan-button {
   position: absolute;
   top: 35.5%;
-  left: 1.3%;
+  left: 4.2%;
+  transform: translateX(-50%);
 }
 
 .back-button {
@@ -240,13 +241,15 @@ export default {
 .shift-button {
   position: absolute;
   top: 56%;
-  left: 0.7%;
+  left: 3.6%;
+  transform: translateX(-50%);
 }
 
 .board-button {
   position: absolute;
   top: 77%;
-  left: 1.5%;
+  left: 3.5%;
+  transform: translateX(-50%);
 }
 
 .button-class {

@@ -15,16 +15,6 @@
                 <el-input
                   class="el-input"
                   maxlength="30"
-                  show-word-limits
-                  v-model="form.id"
-                  disabled
-                />
-              </el-form-item>
-
-              <el-form-item class="el-form-item">
-                <el-input
-                  class="el-input"
-                  maxlength="30"
                   show-word-limit
                   placeholder="用户名"
                   v-model="form.name"
@@ -97,11 +87,10 @@
 import { useRouter } from "vue-router";
 import { reactive } from "vue";
 import instance from "@/axios";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { onMounted } from "vue";
 
 const form = reactive({
-  id: "",
   name: "",
   password: "",
   email: "",
@@ -145,11 +134,17 @@ const commit = async () => {
     })
     .then((res) => {
       if (res.data.code === 200) {
-        ElMessage({
-          message: res.data.message,
-          type: "success",
+        const id = res.data.id;
+        ElMessageBox.alert(`注册成功，你的学号是：${id}`, "提示", {
+          confirmButtonText: "确定",
+          callback: () => {
+            ElMessage({
+              message: res.data.message,
+              type: "success",
+            });
+            router.push("/");
+          },
         });
-        router.push("/");
       } else {
         ElMessage.error(res.data.message);
       }
