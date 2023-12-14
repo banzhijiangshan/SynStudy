@@ -17,7 +17,7 @@ class Client:
         self.heartbeat_timer = threading.Timer(self.heartbeat_interval, self.check_heartbeat)
         self.heartbeat_timer.start()
 
-    def enter_classroom(self, classroom_id):
+    def set_classroom(self, classroom_id):
         self.classroom_id = classroom_id
 
     def check_heartbeat(self):

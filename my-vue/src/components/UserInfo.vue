@@ -136,7 +136,7 @@ export default {
     load() {
       instance.get("/getUserInfo").then((res) => {
         this.imageUrl = res.data.userInfo.image;
-        //this.form.password = res.data.userInfo.password;
+        // this.form.password = res.data.userInfo.password;
         this.form.username = res.data.userInfo.username;
         this.form.age = res.data.userInfo.age;
         this.form.sex = res.data.userInfo.sex;

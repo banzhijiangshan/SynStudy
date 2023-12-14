@@ -205,6 +205,9 @@ def update_user_info(id, data):
     # only set to given id
     query = query[:-2] + " WHERE id = " + str(id)
 
+    # debug
+    print("in update_user_info: query", query)
+
     try:
         cursor.execute(query)
     except sqlite3.IntegrityError as err:
