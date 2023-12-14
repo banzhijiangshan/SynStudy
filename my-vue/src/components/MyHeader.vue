@@ -5,6 +5,7 @@
       placeholder="输入你的计划项，按回车键加入列表"
       v-model="title"
       @keyup.enter="add"
+      maxlength="34"
     />
   </div>
 </template>

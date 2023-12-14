@@ -198,12 +198,10 @@
             <div class="list-main-text">
               <p>简述：{{ item.titleContent }}</p>
             </div>
-            <div style="flex-grow: 1"></div>
             <el-button
               type="info"
               class="info-button"
               @click="toComment(item.id)"
-              style="margin-right: 59px"
             >
               查看详情
             </el-button>
@@ -1142,6 +1140,7 @@ export default {
 }
 
 .info-button {
+  margin-right: 20px;
   border-radius: 10px;
   border: none;
   color: white;
