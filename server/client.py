@@ -4,7 +4,7 @@ import threading
 # import time
 import database
 
-_MAX_MISSED = 3
+_MAX_MISSED = 20
 
 class Client:
     def __init__(self, client_id, user_id):

@@ -20,9 +20,9 @@ from client import Client
 app = Flask(__name__)
 app.secret_key = 'a_random_key'
 
-# session lifetime should be shorter than 2*heartbeat_interval?
+# session lifetime should be shorter than _MAX_MISSED*heartbeat_interval?
 # 否则有可能client已删除，但session未过期，导致用户不会退出登录，但人数已经减少
-app.config['PERMANENT_SESSION_LIFETIME'] = 6   # need to consider again, this is usually too short
+app.config['PERMANENT_SESSION_LIFETIME'] = 60   # need to consider again, this is usually too short
 
 bcrypt = Bcrypt(app)
 
