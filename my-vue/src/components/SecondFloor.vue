@@ -67,7 +67,7 @@ export default {
     }
     ElMessageBox.alert("二层尚在开发中，敬请期待", "提示", {
       confirmButtonText: "确定",
-      callback: (action) => {
+      callback: () => {
         this.$router.push("/floor");
       },
     });

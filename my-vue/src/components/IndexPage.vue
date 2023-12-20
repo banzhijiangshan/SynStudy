@@ -69,6 +69,7 @@ import { reactive } from "vue";
 import instance from "@/axios";
 import { ElMessage } from "element-plus";
 import LunBo from "./LunBo.vue";
+import md5 from "js-md5";
 
 const router = useRouter();
 
@@ -82,10 +83,11 @@ const login = async () => {
     ElMessage.error("用户名或密码为空");
     return;
   }
+  let password = md5(form.password);
   instance
     .post("/login", {
       name: form.name,
-      password: form.password,
+      password: password,
     })
     .then((res) => {
       if (res.data.code === 200) {

@@ -88,6 +88,7 @@ import { useRouter } from "vue-router";
 import { reactive } from "vue";
 import instance from "@/axios";
 import { ElMessage, ElMessageBox } from "element-plus";
+import md5 from "js-md5";
 
 const form = reactive({
   name: "",
@@ -125,10 +126,11 @@ const commit = async () => {
     ElMessage.error("邮箱格式不正确");
     return;
   }
+  let password = md5(form.password);
   instance
     .post("/register", {
       name: form.name,
-      password: form.password,
+      password: password,
       email: form.email,
     })
     .then((res) => {
