@@ -46,6 +46,8 @@
 <script>
 import PersonalDia from "./UserInfo.vue";
 import InfoDia from "./MoreInfo.vue";
+import { ElMessageBox } from "element-plus";
+
 export default {
   components: {
     PersonalDia,
@@ -63,6 +65,12 @@ export default {
     } else {
       this.isDay = false;
     }
+    ElMessageBox.alert("二层尚在开发中，敬请期待", "提示", {
+      confirmButtonText: "确定",
+      callback: (action) => {
+        this.$router.push("/floor");
+      },
+    });
   },
   methods: {
     showPersonalDialog() {
