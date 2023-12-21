@@ -8,7 +8,7 @@ send_requests() {
         local name="user$1_$counter"
         local email="email$1_$counter@example.com"
 
-        curl -X POST http://192.168.31.217:8080/register \
+        curl -X POST http://10.6.153.60:8080/register \
             -H "Content-Type: application/json" \
             -d "{\"name\":\"$name\",\"password\":\"123456\",\"email\":\"$email\"}"
 

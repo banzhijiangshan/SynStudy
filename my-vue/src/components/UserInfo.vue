@@ -28,7 +28,7 @@
               />-->
               <el-upload
                 class="avatar-uploader"
-                action="/uploadAvatar"
+                action="/api/uploadAvatar"
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload"
@@ -143,13 +143,13 @@ export default {
     load() {
       instance.get("/getUserInfo").then((res) => {
         this.imageUrl = res.data.userInfo.image;
-        if (this.imageUrl === "/static/user_pics/default.jpg") {
+        if (this.imageUrl === "/api/static/user_pics/default.jpg") {
           this.imageUrl = "";
         }
         // this.form.password = res.data.userInfo.password;
         this.form.username = res.data.userInfo.username;
         this.form.age = res.data.userInfo.age;
-        if (res.data.userInfo === 1) {
+        if (res.data.userInfo.sex === 1) {
           this.radio = "1";
         } else {
           this.radio = "0";
@@ -164,6 +164,11 @@ export default {
       });
     },
     submit() {
+      if (this.radio === "1") {
+        this.form.sex = 1;
+      } else {
+        this.form.sex = 0;
+      }
       instance.post("/updateUserInfo", this.form).then((res) => {
         if (res.data.code === 200) {
           ElMessage({

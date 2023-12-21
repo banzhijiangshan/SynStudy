@@ -128,6 +128,7 @@ def get_user_info():
     # print(user_info)
     image_url = url_for('static', \
                         filename=user_info['image'] if user_info['image'] else "user_pics/default.jpg")
+    image_url = '/api' + image_url
     # if user_info['image'] is None:
     #     image_url = None
     # else:
@@ -164,6 +165,7 @@ def update_user_info():
 @app.route('/uploadAvatar', methods=['POST',])
 def upload_avatar():
     # Check if the request has the file part
+    print("hhhhhh\n")
     print(request.files)
     if 'file' not in request.files:
         return jsonify(code=400, message="No file part")
@@ -290,6 +292,7 @@ def get_question_list():
         processed_question['titleContent'] = question[1]
         processed_question['imageUrl'] = url_for(
                 'static', filename=question[2] if question[2] else "user_pics/default.jpg")
+        processed_question['imageUrl'] = '/api' + processed_question['imageUrl']
         # if question[2] is None:
         #     processed_question['imageUrl'] = None
         # else:
@@ -330,6 +333,8 @@ def get_question_content():
     return_data = {}
     return_data['avatarUrl'] = url_for(
             'static', filename=question_content[0] if question_content[0] else "user_pics/default.jpg")
+    return_data['avatarUrl'] = '/api' + return_data['avatarUrl']
+    
     # if question_content[0] is None:
     #     return_data['avatarUrl'] = None
     # else:
@@ -344,6 +349,7 @@ def get_question_content():
             processed_comment = {}
             processed_comment['commenterUrl'] = url_for(
                     'static', filename=comment[0] if comment[0] else "user_pics/default.jpg")
+            processed_comment['commenterUrl'] = '/api' + processed_comment['commenterUrl']
             # if comment[0] is None:
             #     processed_comment['commenterUrl'] = None
             # else:
@@ -362,6 +368,7 @@ def get_question_content():
                     processed_reply = {}
                     processed_reply['fromUserAvatarUrl'] = url_for(
                             'static', filename=reply[0] if reply[0] else "user_pics/default.jpg")
+                    processed_reply['fromUserAvatarUrl'] = '/api' + processed_reply['fromUserAvatarUrl']
                     # if reply[0] is None:
                     #     processed_reply['fromUserAvatarUrl'] = None
                     # else:
@@ -417,6 +424,7 @@ def insert_comment():
     user_info = database.fetch_user_info(user_id)
     image_url = url_for('static', \
                         filename=user_info['image'] if user_info['image'] else "user_pics/default.jpg")
+    image_url = '/api' + image_url
     # if user_info['image'] is None:
     #     image_url = None
     # else:
@@ -467,6 +475,7 @@ def get_newest_question():
         processed_question['titleContent'] = question[1]
         processed_question['imageUrl'] = url_for(
             'static', filename=question[2] if question[2] else "user_pics/default.jpg")
+        processed_question['imageUrl'] = '/api' + processed_question['imageUrl']
         processed_question['userName'] = question[3]
         processed_question['askTime'] = question[4]
         processed_question_list.append(processed_question)
