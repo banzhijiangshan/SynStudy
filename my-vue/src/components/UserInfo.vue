@@ -28,7 +28,7 @@
               />-->
               <el-upload
                 class="avatar-uploader"
-                action="/api/uploadAvatar"
+                action="getUploadAction()"
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload"
@@ -140,10 +140,20 @@ export default {
       this.load();
       this.dialogVisible = true;
     },
+    getUploadAction() {
+      if (process.env.NODE_ENV === "production") {
+        return "/api/uploadAvatar"; // 生产环境的上传地址
+      } else {
+        return "/uploadAvatar"; // 测试环境的上传地址
+      }
+    },
     load() {
       instance.get("/getUserInfo").then((res) => {
         this.imageUrl = res.data.userInfo.image;
-        if (this.imageUrl === "/api/static/user_pics/default.jpg") {
+        if (
+          this.imageUrl === "/api/static/user_pics/default.jpg" ||
+          this.imageUrl === "/static/user_pics/default.jpg"
+        ) {
           this.imageUrl = "";
         }
         // this.form.password = res.data.userInfo.password;
